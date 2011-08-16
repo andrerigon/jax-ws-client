@@ -1,0 +1,65 @@
+h2. WHY?
+
+just trying to make client code easier to write
+
+h2. INSTALLATION
+
+<pre>
+<code>git clone git://github.com/andrerigon/vraptor-client.git
+cd vraptor-client
+mvn install</code>
+</pre>
+
+h2. USAGE
+
+if you use spring, there is a factory bean to create the services for you
+
+<pre>
+<code>
+<bean name="factory" class=" br.com.vraptor.client.spring.SpringRestFactory" />
+</code>
+</pre>
+
+it will need some beans:
+
+a class implementing:
+<pre>
+<code>
+br.com.vraptor.client.RestClient
+</code>
+</pre>
+
+to make the http requests.
+
+
+the base path for the request. for example:
+<pre>
+<code>
+<bean name="path" class="java.lang.String">
+		<constructor-arg value="/awesome-app/" />
+	</bean>
+</code>
+</pre>
+
+a class implementing:
+<pre>
+<code>
+br.com.vraptor.client.classprovider.RestClassesProvider
+</code>
+</pre>
+
+it will inform which interfaces will be intercepted.
+If you want, you can use a use ClasspathScannerRestClassesProvider, and provide a base package to scan. Any interfaces will be loaded.
+
+
+and finally,
+
+a class implementing:
+<pre>
+<code>
+br.com.vraptor.client.ResultParser
+</code>
+</pre>
+
+it will parse the result from the request.
+
