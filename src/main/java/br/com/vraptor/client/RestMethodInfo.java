@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import br.com.caelum.vraptor.Delete;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
@@ -45,7 +46,10 @@ public class RestMethodInfo {
 		if (method.isAnnotationPresent(Post.class)) {
 			return method.getAnnotation(Post.class).value()[0];
 		}
-		return null;
+		if( method.isAnnotationPresent(Delete.class) ){
+			return method.getAnnotation(Delete.class).value()[0];
+		}
+		throw new IllegalArgumentException("no path information found for method: " + method.getName());
 	}
 }
 
@@ -63,7 +67,13 @@ enum HttpMethod {
 		public String request(RestMethodInfo info, String path, Object[] args, RestClient restClient) {
 			return restClient.post(requestPath(info, path), paramsMap(info, args));
 		}
-	};
+	},
+	DELETE{
+
+		@Override
+		public String request(RestMethodInfo info, String path, Object[] args, RestClient restClient) {
+			return restClient.delete(requestPath(info, path), paramsMap(info, args));
+		}};
 
 	public static HttpMethod fromMethod(Method method) {
 		if (method.isAnnotationPresent(Path.class) || method.isAnnotationPresent(Get.class)) {
@@ -71,6 +81,9 @@ enum HttpMethod {
 		}
 		if (method.isAnnotationPresent(Post.class)) {
 			return POST;
+		}
+		if(method.isAnnotationPresent( Delete.class )){
+			return DELETE;
 		}
 		throw new IllegalArgumentException("no method found");
 	}
