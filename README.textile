@@ -4,9 +4,6 @@ just trying to make client code easier to write
 
 h2. INSTALLATION
 
-You need to let vraptor use interfaces to obtain controller's information.
-There's an implementation at: https://gist.github.com/1149159
-
 <pre>
 <code>git clone git://github.com/andrerigon/vraptor-client.git
 cd vraptor-client
@@ -14,6 +11,9 @@ mvn install</code>
 </pre>
 
 h2. USAGE
+
+You need to let vraptor use interfaces to obtain controller's information.
+There's an implementation at: https://gist.github.com/1149159
 
 if you use spring, there is a factory bean to create the services for you
 
