@@ -1,5 +1,6 @@
 package br.com.vraptor.client;
 
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -57,6 +58,20 @@ public class RequestTest {
 
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	public void should_extract_correct_info_and_make_a_request_using_path_params() throws Throwable {
+
+		restProxyHandler().invoke(null, sampleMethodWithParamInThePath(), new Object[] { 12, "andre" });
+
+		verify(client).get(eq(path + "bla/12/andre"), anyMap());
+
+	}
+
+	private Method sampleMethodWithParamInThePath() throws SecurityException, NoSuchMethodException {
+		return SampleService.class.getDeclaredMethod("testPathWithParam", String.class, String.class);
+	}
+
 	private Method sampleDeleteMethod() throws SecurityException, NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testDelete", int.class);
 	}
@@ -102,4 +117,7 @@ interface SampleService {
 
 	@Delete("testDelete")
 	void testDelete(@Named("id") int id);
+
+	@Path("bla/{id}/{name}")
+	void testPathWithParam(@Named("id") String id, @Named("name") String name);
 }

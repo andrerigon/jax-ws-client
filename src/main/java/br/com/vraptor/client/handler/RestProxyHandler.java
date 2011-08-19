@@ -13,28 +13,28 @@ public class RestProxyHandler implements InvocationHandler {
 
 	private final RestClient restClient;
 
-	private final String path;
+	private final String basePath;
 
 	private Map<Method, RestMethodInfo> cache = new HashMap<Method, RestMethodInfo>();
 
 	private final ResultParser parser;
 
-	public RestProxyHandler(RestClient restClient, String path, ResultParser parser) {
+	public RestProxyHandler(RestClient restClient, String basePath, ResultParser parser) {
 		this.restClient = restClient;
-		this.path = path;
+		this.basePath = basePath;
 		this.parser = parser;
 	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		RestMethodInfo info = findMethodInfo(method);
-		final String result = info.invoke(restClient, path, args);
+		final String result = info.invoke(restClient, args);
 		return parser.parse(result, method.getReturnType());
 	}
 
 	private RestMethodInfo findMethodInfo(Method method) {
 		if (!cache.containsKey(method)) {
-			cache.put(method, new RestMethodInfo(method));
+			cache.put(method, new RestMethodInfo(method, basePath));
 		}
 		return cache.get(method);
 	}
