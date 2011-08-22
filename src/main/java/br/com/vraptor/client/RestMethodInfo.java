@@ -9,6 +9,7 @@ import br.com.caelum.vraptor.Delete;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
+import br.com.caelum.vraptor.Put;
 
 public class RestMethodInfo {
 
@@ -38,6 +39,9 @@ public class RestMethodInfo {
 		}
 		if (method.isAnnotationPresent(Delete.class)) {
 			return method.getAnnotation(Delete.class).value()[0];
+		}
+		if (method.isAnnotationPresent(Put.class)) {
+			return method.getAnnotation(Put.class).value()[0];
 		}
 		throw new IllegalArgumentException("no path information found for method: " + method.getName());
 	}

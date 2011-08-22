@@ -21,6 +21,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import br.com.caelum.vraptor.Delete;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
+import br.com.caelum.vraptor.Put;
 import br.com.vraptor.client.handler.RestProxyHandler;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -66,6 +67,19 @@ public class RequestTest {
 
 		verify(client).get(eq(path + "bla/12/andre"), anyMap());
 
+	}
+
+	@Test
+	public void should_extract_correct_info_and_do_a_put() throws Throwable {
+
+		restProxyHandler().invoke(null, samplePutMethod(), new Object[] { 12 });
+
+		verify(client).put(eq(path + "testPut"), aMapWithKeyValue("id", 12));
+
+	}
+
+	private Method samplePutMethod() throws SecurityException, NoSuchMethodException {
+		return SampleService.class.getDeclaredMethod("testPut", int.class);
 	}
 
 	private Method sampleMethodWithParamInThePath() throws SecurityException, NoSuchMethodException {
@@ -117,6 +131,9 @@ interface SampleService {
 
 	@Delete("testDelete")
 	void testDelete(@Named("id") int id);
+
+	@Put("testPut")
+	void testPut(@Named("id") int id);
 
 	@Path("bla/{id}/{name}")
 	void testPathWithParam(@Named("id") String id, @Named("name") String name);
