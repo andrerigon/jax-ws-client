@@ -1,9 +1,11 @@
 package br.com.vraptor.client;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -31,6 +33,9 @@ public class RequestTest {
 	RestClient client;
 
 	String path = "/jedi/";
+
+	@Mock
+	ResultParser resultParser;
 
 	@Test
 	public void should_extract_correct_info_and_do_a_get() throws Throwable {
@@ -78,6 +83,20 @@ public class RequestTest {
 
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	public void should_deal_with_exceptions() throws Throwable {
+
+		when(client.get(anyString(), anyMap())).thenThrow(new RuntimeException());
+
+		Method get = sampleGetMethod();
+		
+		restProxyHandler().invoke(null, get, new Object[] { 12 });
+
+		verify(resultParser).dealWith(any(RuntimeException.class), eq(get));
+
+	}
+
 	private Method samplePutMethod() throws SecurityException, NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testPut", int.class);
 	}
@@ -95,7 +114,7 @@ public class RequestTest {
 	}
 
 	private RestProxyHandler restProxyHandler() {
-		return new RestProxyHandler(client, path, mock(ResultParser.class));
+		return new RestProxyHandler(client, path, resultParser);
 	}
 
 	private Method sampleGetMethod() throws SecurityException, NoSuchMethodException {

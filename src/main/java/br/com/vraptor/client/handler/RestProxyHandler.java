@@ -28,8 +28,12 @@ public class RestProxyHandler implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		RestMethodInfo info = findMethodInfo(method);
-		final String result = info.invoke(restClient, args);
-		return parser.parse(result, method.getReturnType());
+		try {
+			final String result = info.invoke(restClient, args);
+			return parser.parse(result, method.getReturnType());
+		} catch (Throwable e) {
+			return parser.dealWith(e, method);
+		}
 	}
 
 	private RestMethodInfo findMethodInfo(Method method) {
