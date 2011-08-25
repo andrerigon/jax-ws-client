@@ -29,6 +29,16 @@ public class SpringRestFactory implements ApplicationContextAware {
 	@Autowired
 	ResultParser parser;
 
+	
+	@Autowired
+	public SpringRestFactory(RestClient restClient, String path, RestClassesProvider provider, ResultParser parser) {
+		super();
+		this.restClient = restClient;
+		this.path = path;
+		this.provider = provider;
+		this.parser = parser;
+	}
+
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		for (Class<?> clazz : provider.classes()) {
