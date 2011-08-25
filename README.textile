@@ -15,7 +15,7 @@ For example, imagine a vraptor controller:
 public class ClientController implements Clients{
 
     @Override
-	public String save(Client client) {
+    public String save(Client client) {
 		log.info(String.format("Saving client with name %s and age %d", client.name, client.age));
 		return "ok";
 	}
@@ -26,11 +26,15 @@ public class ClientController implements Clients{
 
 it implements Clients interface:
 
+<pre>
+<code>
 public interface Clients {
 
    @Post("save")
    String save(@Named("client") Client client);
 }
+</code>
+</pre>
 
 int the client, you just have to inject the proxy implementation and use the interface:
 
