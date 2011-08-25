@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 
-
 public class ClasspathScannerRestClassesProvider implements RestClassesProvider {
 
+	private String packageToScan;
+
 	@Autowired
-	String packageToScan;
+	public ClasspathScannerRestClassesProvider(String packageToScan) {
+		this.packageToScan = packageToScan;
+	}
 
 	@Override
 	public Set<Class<?>> classes() {

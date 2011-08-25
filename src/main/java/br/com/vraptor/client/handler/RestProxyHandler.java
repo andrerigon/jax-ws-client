@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.reflect.TypeToken;
+
 import br.com.vraptor.client.RestClient;
 import br.com.vraptor.client.RestMethodInfo;
 import br.com.vraptor.client.ResultParser;
@@ -27,10 +29,13 @@ public class RestProxyHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		if( method.getName().equals("equals") ){
+			return false;
+		}
 		RestMethodInfo info = findMethodInfo(method);
 		try {
 			final String result = info.invoke(restClient, args);
-			return parser.parse(result, method.getReturnType());
+			return parser.parse(result, method.getGenericReturnType());
 		} catch (Throwable e) {
 			return parser.dealWith(e, method);
 		}
