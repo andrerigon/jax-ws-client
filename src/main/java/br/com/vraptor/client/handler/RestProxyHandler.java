@@ -5,8 +5,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.reflect.TypeToken;
-
 import br.com.vraptor.client.RestClient;
 import br.com.vraptor.client.RestMethodInfo;
 import br.com.vraptor.client.ResultParser;
