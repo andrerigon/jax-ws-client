@@ -43,7 +43,7 @@ class RequestInfo {
 		Set<String> pathParams = new LinkedHashSet<String>();
 		for (String name : params.keySet()) {
 			if (paramExistsInPath(path, name)) {
-				path = path.replaceAll(regex(name), params.get(name));
+				path = path.replaceAll(regex(path, name), params.get(name));
 				pathParams.add(name);
 			}
 		}
@@ -52,11 +52,36 @@ class RequestInfo {
 	}
 
 	private boolean paramExistsInPath(String path, String name) {
-		return new Scanner(path).findInLine(regex(name)) != null;
+		return isJustKey(path, name) || isKeyValue(path, name);
 	}
 
-	private String regex(String name) {
-		return "\\{" + name+ "(\\:?.*)\\}";
+	private String regex(String path, String name){
+		if(isJustKey(path, name)){
+			return regexKey(name);
+		}
+		else if(isKeyValue(path, name)){
+			return regexKeyValue(name);
+		}
+		else {
+			throw new IllegalStateException();
+		}
+	}
+	
+	private boolean isJustKey(String path, String name){
+		return new Scanner(path).findInLine(regexKey(name)) != null;
+	}
+	
+	private boolean isKeyValue(String path, String name){
+		return new Scanner(path).findInLine(regexKeyValue(name)) != null;
+	}
+	
+	
+	private String regexKey(String name){
+		return String.format("\\{%s\\}", name);
+	}
+
+	private String regexKeyValue(String name) {
+		return "\\{" + name+ "\\:?.*\\}";
 	}
 
 	private void removePathParams(Set<String> pathParams,

@@ -45,4 +45,15 @@ public class RestMethodInfo {
 		}
 		throw new IllegalArgumentException("no path information found for method: " + method.getName());
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("RestMethodInfo [path=").append(path)
+				.append(", parametersNames=").append(parametersNames)
+				.append(", httpMethod=").append(httpMethod).append("]");
+		return builder.toString();
+	}
+	
+	
 }
