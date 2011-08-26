@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 class RequestInfo {
@@ -41,9 +42,8 @@ class RequestInfo {
 	protected String requestPath(String path, Map<String, String> params) {
 		Set<String> pathParams = new LinkedHashSet<String>();
 		for (String name : params.keySet()) {
-			String pathParam = "{" + name + "}";
-			if (path.contains(pathParam)) {
-				path = path.replace(pathParam, params.get(name));
+			if (paramExistsInPath(path, name)) {
+				path = path.replaceAll(regex(name), params.get(name));
 				pathParams.add(name);
 			}
 		}
@@ -51,9 +51,19 @@ class RequestInfo {
 		return path;
 	}
 
-	private void removePathParams(Set<String> pathParams, Map<String, String> params) {
+	private boolean paramExistsInPath(String path, String name) {
+		return new Scanner(path).findInLine(regex(name)) != null;
+	}
+
+	private String regex(String name) {
+		return "\\{" + name+ "(\\:?.*)\\}";
+	}
+
+	private void removePathParams(Set<String> pathParams,
+			Map<String, String> params) {
 		for (String param : pathParams) {
 			params.remove(param);
 		}
 	}
+	
 }

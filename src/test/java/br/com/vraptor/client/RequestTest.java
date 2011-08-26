@@ -40,35 +40,45 @@ public class RequestTest {
 	@Test
 	public void should_extract_correct_info_and_do_a_get() throws Throwable {
 
-		restProxyHandler().invoke(null, sampleGetMethod(), new Object[] { "andre" });
+		restProxyHandler().invoke(null, sampleGetMethod(),
+				new Object[] { "andre" });
 
-		verify(client).get(eq(path + "testGet"), aMapWithKeyValue("name", "andre"));
-
-	}
-
-	@Test
-	public void should_extract_correct_info_using_path_and_do_a_get() throws Throwable {
-
-		restProxyHandler().invoke(null, samplePathMethod(), new Object[] { "andre" });
-
-		verify(client).get(eq(path + "testPath"), aMapWithKeyValue("name", "andre"));
+		verify(client).get(eq(path + "testGet"),
+				aMapWithKeyValue("name", "andre"));
 
 	}
 
 	@Test
-	public void should_extract_correct_info_using_delete_and_do_a_delete() throws Throwable {
+	public void should_extract_correct_info_using_path_and_do_a_get()
+			throws Throwable {
 
-		restProxyHandler().invoke(null, sampleDeleteMethod(), new Object[] { 12 });
+		restProxyHandler().invoke(null, samplePathMethod(),
+				new Object[] { "andre" });
 
-		verify(client).delete(eq(path + "testDelete"), aMapWithKeyValue("id", 12));
+		verify(client).get(eq(path + "testPath"),
+				aMapWithKeyValue("name", "andre"));
+
+	}
+
+	@Test
+	public void should_extract_correct_info_using_delete_and_do_a_delete()
+			throws Throwable {
+
+		restProxyHandler().invoke(null, sampleDeleteMethod(),
+				new Object[] { 12 });
+
+		verify(client).delete(eq(path + "testDelete"),
+				aMapWithKeyValue("id", 12));
 
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void should_extract_correct_info_and_make_a_request_using_path_params() throws Throwable {
+	public void should_extract_correct_info_and_make_a_request_using_path_params()
+			throws Throwable {
 
-		restProxyHandler().invoke(null, sampleMethodWithParamInThePath(), new Object[] { 12, "andre" });
+		restProxyHandler().invoke(null, sampleMethodWithParamInThePath(),
+				new Object[] { 12, "andre" });
 
 		verify(client).get(eq(path + "bla/12/andre"), anyMap());
 
@@ -87,29 +97,49 @@ public class RequestTest {
 	@SuppressWarnings("unchecked")
 	public void should_deal_with_exceptions() throws Throwable {
 
-		when(client.get(anyString(), anyMap())).thenThrow(new RuntimeException());
+		when(client.get(anyString(), anyMap())).thenThrow(
+				new RuntimeException());
 
 		Method get = sampleGetMethod();
-		
+
 		restProxyHandler().invoke(null, get, new Object[] { 12 });
 
 		verify(resultParser).dealWith(any(RuntimeException.class), eq(get));
 
 	}
 
-	private Method samplePutMethod() throws SecurityException, NoSuchMethodException {
+	@Test
+	@SuppressWarnings("unchecked")
+	public void should_build_path_with_regex() throws Throwable {
+
+		restProxyHandler().invoke(null, sampleMethodWithRegex(), new Object[] { 12 });
+
+		verify(client).get(eq(path + "regex/12/bla"), anyMap());
+
+	}
+	
+	private Method sampleMethodWithRegex() throws SecurityException, NoSuchMethodException{
+		return SampleService.class.getDeclaredMethod("testWithRegex", int.class);
+	} 
+
+	private Method samplePutMethod() throws SecurityException,
+			NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testPut", int.class);
 	}
 
-	private Method sampleMethodWithParamInThePath() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testPathWithParam", String.class, String.class);
+	private Method sampleMethodWithParamInThePath() throws SecurityException,
+			NoSuchMethodException {
+		return SampleService.class.getDeclaredMethod("testPathWithParam",
+				String.class, String.class);
 	}
 
-	private Method sampleDeleteMethod() throws SecurityException, NoSuchMethodException {
+	private Method sampleDeleteMethod() throws SecurityException,
+			NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testDelete", int.class);
 	}
 
-	private Method samplePathMethod() throws SecurityException, NoSuchMethodException {
+	private Method samplePathMethod() throws SecurityException,
+			NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testPath", String.class);
 	}
 
@@ -117,23 +147,27 @@ public class RequestTest {
 		return new RestProxyHandler(client, path, resultParser);
 	}
 
-	private Method sampleGetMethod() throws SecurityException, NoSuchMethodException {
+	private Method sampleGetMethod() throws SecurityException,
+			NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testGet", String.class);
 	}
 
-	private Map<String, String> aMapWithKeyValue(final String key, final Object value) {
+	private Map<String, String> aMapWithKeyValue(final String key,
+			final Object value) {
 		return Matchers.argThat(new BaseMatcher<Map<String, String>>() {
 
 			@Override
 			public boolean matches(Object item) {
 				@SuppressWarnings("unchecked")
 				Map<String, String> map = (Map<String, String>) item;
-				return map.containsKey(key) && value.toString().equals(map.get(key));
+				return map.containsKey(key)
+						&& value.toString().equals(map.get(key));
 			}
 
 			@Override
 			public void describeTo(Description description) {
-				description.appendText("a map containing key: " + key + " and value: " + value);
+				description.appendText("a map containing key: " + key
+						+ " and value: " + value);
 			}
 		});
 	}
@@ -156,4 +190,7 @@ interface SampleService {
 
 	@Path("bla/{id}/{name}")
 	void testPathWithParam(@Named("id") String id, @Named("name") String name);
+
+	@Get("regex/{id:[0-9]*{0}}/bla")
+	void testWithRegex(@Named("id") int id);
 }
