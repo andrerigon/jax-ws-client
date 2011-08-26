@@ -112,15 +112,18 @@ public class RequestTest {
 	@SuppressWarnings("unchecked")
 	public void should_build_path_with_regex() throws Throwable {
 
-		restProxyHandler().invoke(null, sampleMethodWithRegex(), new Object[] { 12 });
+		restProxyHandler().invoke(null, sampleMethodWithRegex(),
+				new Object[] { 12 });
 
 		verify(client).get(eq(path + "regex/12/bla"), anyMap());
 
 	}
-	
-	private Method sampleMethodWithRegex() throws SecurityException, NoSuchMethodException{
-		return SampleService.class.getDeclaredMethod("testWithRegex", int.class);
-	} 
+
+	private Method sampleMethodWithRegex() throws SecurityException,
+			NoSuchMethodException {
+		return SampleService.class
+				.getDeclaredMethod("testWithRegex", int.class);
+	}
 
 	private Method samplePutMethod() throws SecurityException,
 			NoSuchMethodException {
