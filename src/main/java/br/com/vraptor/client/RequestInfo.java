@@ -78,7 +78,7 @@ class RequestInfo {
 	}
 
 	private String regexKeyValue(String name) {
-		return "\\{" + name + "\\:(.*?)[\\}]?\\}";
+		return "\\{" + name + "\\:?(.*?)[\\}]?\\}";
 	}
 
 	private void removePathParams(Set<String> pathParams, Map<String, String> params) {
