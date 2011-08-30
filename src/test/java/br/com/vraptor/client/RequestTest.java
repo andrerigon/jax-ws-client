@@ -2,6 +2,7 @@ package br.com.vraptor.client;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -93,7 +94,7 @@ public class RequestTest {
 
 		restProxyHandler().invoke(null, get, new Object[] { 12 });
 
-		verify(resultParser).dealWith(any(RuntimeException.class), eq(get));
+		verify(resultParser).dealWith(any(RuntimeException.class), eq(get), (RestMethodInfo) anyObject());
 
 	}
 

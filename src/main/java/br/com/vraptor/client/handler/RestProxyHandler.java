@@ -27,7 +27,7 @@ public class RestProxyHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		if( method.getName().equals("equals") ){
+		if (method.getName().equals("equals")) {
 			return false;
 		}
 		RestMethodInfo info = findMethodInfo(method);
@@ -35,7 +35,7 @@ public class RestProxyHandler implements InvocationHandler {
 			final String result = info.invoke(restClient, args);
 			return parser.parse(result, method.getGenericReturnType());
 		} catch (Throwable e) {
-			return parser.dealWith(e, method);
+			return parser.dealWith(e, method, info);
 		}
 	}
 

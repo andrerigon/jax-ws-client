@@ -49,11 +49,21 @@ public class RestMethodInfo {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("RestMethodInfo [path=").append(path)
-				.append(", parametersNames=").append(parametersNames)
+		builder.append("RestMethodInfo [path=").append(path).append(", parametersNames=").append(parametersNames)
 				.append(", httpMethod=").append(httpMethod).append("]");
 		return builder.toString();
 	}
-	
-	
+
+	public String getPath() {
+		return path;
+	}
+
+	public List<String> getParametersNames() {
+		return parametersNames;
+	}
+
+	public String getHttpMethod() {
+		return httpMethod.toString();
+	}
+
 }
