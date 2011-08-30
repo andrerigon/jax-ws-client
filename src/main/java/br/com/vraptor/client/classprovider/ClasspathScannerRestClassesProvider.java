@@ -36,7 +36,7 @@ public class ClasspathScannerRestClassesProvider implements RestClassesProvider 
 
 	private Set<BeanDefinition> scanPackage(String packageToScan) {
 		final ClassPathScanningCandidateComponentProvider provider = new CustomClassPathScanningCandidateComponentProvider(
-				true);
+				false);
 		provider.addIncludeFilter(new IsInterfaceTypeFilter());
 
 		Set<BeanDefinition> components = provider.findCandidateComponents(packageToScan);
