@@ -12,7 +12,7 @@ import br.com.caelum.vraptor.Put;
 enum HttpMethod {
 	GET {
 		@Override
-		public String makeRequest(RequestInfo requestInfo, RestClient restClient) {
+		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
 			return restClient.get(requestInfo.getPath(), requestInfo.getParams());
 		}
 
@@ -20,7 +20,7 @@ enum HttpMethod {
 
 	POST {
 		@Override
-		public String makeRequest(RequestInfo requestInfo, RestClient restClient) {
+		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
 			return restClient.post(requestInfo.getPath(), requestInfo.getParams());
 		}
 		
@@ -28,14 +28,14 @@ enum HttpMethod {
 	DELETE {
 
 		@Override
-		public String makeRequest(RequestInfo requestInfo, RestClient restClient) {
+		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
 			return restClient.delete(requestInfo.getPath(), requestInfo.getParams());
 		}
 	},
 	PUT {
 
 		@Override
-		protected String makeRequest(RequestInfo requestInfo, RestClient restClient) {
+		protected String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
 			return restClient.put(requestInfo.getPath(), requestInfo.getParams());
 		}
 	};
@@ -66,9 +66,9 @@ enum HttpMethod {
 		return false;
 	}
 
-	public String request(RequestInfo info, RestClient restClient) {
+	public String request(RequestInfo info, RestClient restClient) throws Exception {
 		return makeRequest(info, restClient);
 	}
 
-	protected abstract String makeRequest(RequestInfo requestInfo, RestClient restClient);
+	protected abstract String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception;
 }

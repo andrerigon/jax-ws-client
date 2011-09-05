@@ -6,26 +6,26 @@ import org.apache.http.HttpResponse;
 
 public interface RestClient {
 
-	String get(String path, Map<String, String> params, Map<String, String> headers);
+	String get(String path, Map<String, String> params, Map<String, String> headers) throws Exception;
 
-	String get(String path, Map<String, String> params);
+	String get(String path, Map<String, String> params) throws Exception;
 
-	String post(String path, Map<String, String> map, Map<String, String> headers);
+	String post(String path, Map<String, String> map, Map<String, String> headers) throws Exception;
 
-	String post(String path, Map<String, String> map);
+	String post(String path, Map<String, String> map) throws Exception;
 
-	HttpResponse postWithHttpResponse(String path, Map<String, String> params, Map<String, String> headers);
+	HttpResponse postWithHttpResponse(String path, Map<String, String> params, Map<String, String> headers) throws Exception;
 
-	String postMultiPartFormData(String path, Map<String, Object> params, Map<String, String> headers);
+	String postMultiPartFormData(String path, Map<String, Object> params, Map<String, String> headers) throws Exception;
 
-	String postMultiPartFormData(String path, Map<String, Object> params);
+	String postMultiPartFormData(String path, Map<String, Object> params) throws Exception;
 
-	String put(String path, Map<String, String> params, Map<String, String> headers);
+	String put(String path, Map<String, String> params, Map<String, String> headers) throws Exception;
 
-	String put(String path, Map<String, String> params);
+	String put(String path, Map<String, String> params) throws Exception;
 
-	String delete(String path, Map<String, String> params, Map<String, String> headers);
+	String delete(String path, Map<String, String> params, Map<String, String> headers) throws Exception;
 
-	String delete(String path, Map<String, String> params);
+	String delete(String path, Map<String, String> params) throws Exception;
 
 }

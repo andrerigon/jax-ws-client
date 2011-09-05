@@ -23,7 +23,7 @@ public class RestMethodInfo {
 		this.httpMethod = HttpMethod.fromMethod(method);
 	}
 
-	public String invoke(RestClient restClient, Object[] args) {
+	public String invoke(RestClient restClient, Object[] args) throws Exception {
 		return httpMethod.request(new RequestInfo(path, parametersNames, args), restClient);
 	}
 
