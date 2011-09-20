@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -26,6 +27,8 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Put;
 import br.com.vraptor.client.handler.RestProxyHandler;
+
+import com.google.common.collect.ImmutableList;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RequestTest {
@@ -62,6 +65,25 @@ public class RequestTest {
 		restProxyHandler().invoke(null, sampleDeleteMethod(), new Object[] { 12 });
 
 		verify(client).delete(eq(path + "testDelete"), aMapWithKeyValue("id", 12));
+
+	}
+
+	@Test
+	public void should_build_url_with_query_string() throws Throwable {
+
+		restProxyHandler().invoke(null, sampleGetMethodWithQueryString(),
+				new Object[] { 12L, ImmutableList.of(123L, 12333L) });
+
+		verify(client).delete(eq(path + "regex-query/12/xit?query=123&query=12333"), aMapWithKeyValue("test", 12));
+
+	}
+
+	@Test
+	public void should_use_white_spaces_when_find_lnull_parameter() throws Throwable {
+
+		restProxyHandler().invoke(null, sampleGetMethodWithQueryString(), new Object[] { null, ImmutableList.of(123L, 12333L) });
+
+		verify(client).delete(eq(path + "regex-query//xit?query=123&query=12333"), aMapWithKeyValue("test", null));
 
 	}
 
@@ -152,13 +174,17 @@ public class RequestTest {
 		return SampleService.class.getDeclaredMethod("testGet", String.class);
 	}
 
-	private Map<String, String> aMapWithKeyValue(final String key, final Object value) {
-		return Matchers.argThat(new BaseMatcher<Map<String, String>>() {
+	private Method sampleGetMethodWithQueryString() throws SecurityException, NoSuchMethodException {
+		return SampleService.class.getDeclaredMethod("testWithQueryString", Long.class, List.class);
+	}
+
+	private Map<String, Object> aMapWithKeyValue(final String key, final Object value) {
+		return Matchers.argThat(new BaseMatcher<Map<String, Object>>() {
 
 			@Override
 			public boolean matches(Object item) {
 				@SuppressWarnings("unchecked")
-				Map<String, String> map = (Map<String, String>) item;
+				Map<String, Object> map = (Map<String, Object>) item;
 				return map.containsKey(key) && value.toString().equals(map.get(key));
 			}
 
@@ -194,4 +220,7 @@ interface SampleService {
 	@Get("regex-complex/{all:[0-9]*{0}}/ALL/{gone:[0-9]*}/GONE/{to:[0-9]*}/TO/{hell:[a-zA-Z0-9]*}/HELL")
 	void testWithRegexComplex(@Named("all") int all, @Named("gone") int gone, @Named("to") int to,
 			@Named("hell") String hell);
+
+	@Get("regex-query/{test:[0-9]+}/xit")
+	void testWithQueryString(@Named("test") Long test, @Named("query") List<Long> query);
 }

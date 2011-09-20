@@ -10,10 +10,9 @@ import java.util.Set;
 class RequestInfo {
 
 	private String path;
-	private Map<String, String> params;
+	private Map<String, Object> params;
 
 	public RequestInfo(String path, List<String> parametersNames, Object[] args) {
-
 		this.params = paramsMap(parametersNames, args);
 		this.path = requestPath(path, params);
 	}
@@ -22,15 +21,20 @@ class RequestInfo {
 		return path;
 	}
 
-	public Map<String, String> getParams() {
+	public Map<String, Object> getParams() {
 		return params;
 	}
 
-	protected Map<String, String> paramsMap(List<String> names, Object[] args) {
-		Map<String, String> map = new HashMap<String, String>();
+	protected Map<String, Object> paramsMap(List<String> names, Object[] args) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		for (int i = 0; i < names.size(); i++) {
 			try {
-				map.putAll(Parameters.paramsFor(args[i], names.get(i)));
+				Object argument = args[i];
+				if (argument != null) {
+					map.putAll(Parameters.paramsFor(args[i], names.get(i)));
+				} else {
+					map.putAll(Parameters.paramsFor("", names.get(i)));
+				}
 			} catch (Exception e) {
 				throw new IllegalArgumentException("could not obtain params");
 			}
@@ -39,16 +43,26 @@ class RequestInfo {
 
 	}
 
-	protected String requestPath(String path, Map<String, String> params) {
+	protected String requestPath(String path, Map<String, Object> params) {
 		Set<String> pathParams = new LinkedHashSet<String>();
+		final StringBuffer queryString = new StringBuffer("?");
 		for (String name : params.keySet()) {
 			if (paramExistsInPath(path, name)) {
-				path = path.replaceAll(regex(path, name), params.get(name));
+				path = path.replaceAll(regex(path, name), params.get(name).toString());
 				pathParams.add(name);
+			} else {
+				Object value = params.get(name);
+				if (value instanceof List) {
+					for (Object valueItem : (List<?>) value) {
+						queryString.append(name + "=" + valueItem.toString() + "&");
+					}
+				} else {
+					queryString.append(name + "=" + value.toString() + "&");
+				}
 			}
 		}
 		removePathParams(pathParams, params);
-		return path;
+		return path + queryString.substring(0, queryString.length()-1);
 	}
 
 	private boolean paramExistsInPath(String path, String name) {
@@ -81,7 +95,7 @@ class RequestInfo {
 		return "\\{" + name + "\\:?(.*?)[\\}]?\\}";
 	}
 
-	private void removePathParams(Set<String> pathParams, Map<String, String> params) {
+	private void removePathParams(Set<String> pathParams, Map<String, Object> params) {
 		for (String param : pathParams) {
 			params.remove(param);
 		}

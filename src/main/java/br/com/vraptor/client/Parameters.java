@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,19 +16,23 @@ import com.thoughtworks.paranamer.CachingParanamer;
 
 public class Parameters {
 
-	public static Map<String, String> paramsFor(Object object, String name) throws IllegalAccessException,
+	public static Map<String, Object> paramsFor(Object object, String name) throws IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException {
 		if (isWrapperType(object.getClass())) {
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put(name, object.toString());
 			return map;
 		}
-		final Map<String, String> params = new HashMap<String, String>();
-		@SuppressWarnings("unchecked")
-		final Map<String, String> beanMap = (Map<String, String>) BeanUtils.describe(object);
-		beanMap.remove("class");
-		for (Entry<String, String> entry : beanMap.entrySet()) {
-			params.put(String.format("%s.%s", name, entry.getKey()), entry.getValue());
+		Map<String, Object> params = new HashMap<String, Object>();
+		if (object instanceof List) {
+			params.put(name, (List<?>) object);
+		} else {
+			@SuppressWarnings("unchecked")
+			final Map<String, String> beanMap = (Map<String, String>) BeanUtils.describe(object);
+			beanMap.remove("class");
+			for (Entry<String, String> entry : beanMap.entrySet()) {
+				params.put(String.format("%s.%s", name, entry.getKey()), entry.getValue());
+			}
 		}
 		return params;
 	}

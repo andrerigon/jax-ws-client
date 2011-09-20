@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -20,7 +22,7 @@ public class ParamsTest {
 
 	@Test
 	public void should_create_params_map_with_simple_value() throws Exception {
-		Map<String, String> params = Parameters.paramsFor("andre", "name");
+		Map<String, Object> params = Parameters.paramsFor("andre", "name");
 
 		assertTrue(params.containsKey("name"));
 		assertTrue("andre".equals(params.get("name")));
@@ -32,10 +34,21 @@ public class ParamsTest {
 		car.model = "fusca";
 		car.year = 1972;
 
-		Map<String, String> params = Parameters.paramsFor(car, "car");
+		Map<String, Object> params = Parameters.paramsFor(car, "car");
 
 		assertEquals("fusca", params.get("car.model"));
 		assertEquals("1972", params.get("car.year"));
+	}
+
+	@Test
+	public void should_create_params_map_with_list() throws Exception {
+		final List<String> carList = new ArrayList<String>();
+		carList.add("mustang");
+		carList.add("camaro");
+
+		Map<String, Object> params = Parameters.paramsFor(carList, "carList");
+
+		assertTrue(params.containsValue(carList));
 	}
 
 	public static class Person {
