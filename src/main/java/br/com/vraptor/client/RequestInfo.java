@@ -45,26 +45,15 @@ class RequestInfo {
 
 	protected String requestPath(String path, Map<String, Object> params) {
 		Set<String> pathParams = new LinkedHashSet<String>();
-		final StringBuffer queryString = new StringBuffer("?");
+
 		for (String name : params.keySet()) {
 			if (paramExistsInPath(path, name)) {
 				path = path.replaceAll(regex(path, name), params.get(name).toString());
 				pathParams.add(name);
-			} else {
-				Object value = params.get(name);
-				if (value instanceof List) {
-					for (Object valueItem : (List<?>) value) {
-						queryString.append(name + "=" + valueItem.toString() + "&");
-						pathParams.add(name);
-					}
-				} else {
-					queryString.append(name + "=" + value.toString() + "&");
-					pathParams.add(name);
-				}
 			}
 		}
-		removePathParams(pathParams, params);
-		return path + queryString.substring(0, queryString.length()-1);
+		removeParams(pathParams, params);
+		return path;
 	}
 
 	private boolean paramExistsInPath(String path, String name) {
@@ -97,7 +86,7 @@ class RequestInfo {
 		return "\\{" + name + "\\:?(.*?)[\\}]?\\}";
 	}
 
-	private void removePathParams(Set<String> pathParams, Map<String, Object> params) {
+	private void removeParams(Set<String> pathParams, Map<String, Object> params) {
 		for (String param : pathParams) {
 			params.remove(param);
 		}

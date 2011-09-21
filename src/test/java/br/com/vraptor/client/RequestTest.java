@@ -28,8 +28,6 @@ import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Put;
 import br.com.vraptor.client.handler.RestProxyHandler;
 
-import com.google.common.collect.ImmutableList;
-
 @RunWith(MockitoJUnitRunner.class)
 public class RequestTest {
 
@@ -68,24 +66,6 @@ public class RequestTest {
 
 	}
 
-	@Test
-	public void should_build_url_with_query_string() throws Throwable {
-
-		restProxyHandler().invoke(null, sampleGetMethodWithQueryString(),
-				new Object[] { 12L, ImmutableList.of(123L, 12333L) });
-
-		verify(client).delete(eq(path + "regex-query/12/xit?query=123&query=12333"), aMapWithKeyValue("test", 12));
-
-	}
-
-	@Test
-	public void should_use_white_spaces_when_find_lnull_parameter() throws Throwable {
-
-		restProxyHandler().invoke(null, sampleGetMethodWithQueryString(), new Object[] { null, ImmutableList.of(123L, 12333L) });
-
-		verify(client).delete(eq(path + "regex-query//xit?query=123&query=12333"), aMapWithKeyValue("test", null));
-
-	}
 
 	@Test
 	@SuppressWarnings("unchecked")
@@ -172,10 +152,6 @@ public class RequestTest {
 
 	private Method sampleGetMethod() throws SecurityException, NoSuchMethodException {
 		return SampleService.class.getDeclaredMethod("testGet", String.class);
-	}
-
-	private Method sampleGetMethodWithQueryString() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testWithQueryString", Long.class, List.class);
 	}
 
 	private Map<String, Object> aMapWithKeyValue(final String key, final Object value) {
