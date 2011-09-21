@@ -55,9 +55,11 @@ class RequestInfo {
 				if (value instanceof List) {
 					for (Object valueItem : (List<?>) value) {
 						queryString.append(name + "=" + valueItem.toString() + "&");
+						pathParams.add(name);
 					}
 				} else {
 					queryString.append(name + "=" + value.toString() + "&");
+					pathParams.add(name);
 				}
 			}
 		}
