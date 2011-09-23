@@ -27,8 +27,11 @@ public class RestProxyHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		if (method.getName().equals("equals")) {
+		if (equalsMethod(method)) {
 			return false;
+		}
+		if (toString(method)) {
+			return "[vraptor-client] proxy for " + interfaceName(proxy);
 		}
 		RestMethodInfo info = findMethodInfo(method);
 		try {
@@ -37,6 +40,18 @@ public class RestProxyHandler implements InvocationHandler {
 		} catch (Throwable e) {
 			return parser.dealWith(e, method, info);
 		}
+	}
+
+	private String interfaceName(Object proxy) {
+		return proxy.getClass().getInterfaces()[0].getSimpleName();
+	}
+
+	private boolean toString(Method method) {
+		return method.getName().equals("toString");
+	}
+
+	private boolean equalsMethod(Method method) {
+		return method.getName().equals("equals");
 	}
 
 	private RestMethodInfo findMethodInfo(Method method) {
