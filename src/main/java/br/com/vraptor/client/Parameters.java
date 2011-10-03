@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,23 +32,33 @@ public class Parameters {
 	public static Map<String, Object> paramsFor(Object object, String name)
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
-		if (isWrapperType(object.getClass()) || isList(object) || isEnum(object)) {
+		if (isWrapperType(object.getClass()) || isList(object)
+				|| isEnum(object)) {
 			return simpleMapForValue(object, name);
 		}
 		Map<String, Object> params = new HashMap<String, Object>();
 		for (Field f : fieldsFrom(object)) {
-			if (isWrapperType(f.getType())) {
-				params.put(paramName(name, f), fieldValue(object, f));
-			} else {
-				params.putAll(paramsFor(fieldValue(object, f),
-						paramName(name, f)));
-			}
+			String paramName = paramName(name, f);
+			Object fieldValue = fieldValue(object, f);
+			params.putAll(mapForField(paramName, fieldValue));
 		}
 		return params;
 	}
 
+	private static Map<String, Object> mapForField(String name, Object value)
+			throws IllegalAccessException, InvocationTargetException,
+			NoSuchMethodException {
+		if (value == null) {
+			return Collections.emptyMap();
+		}
+		if (isWrapperType(value.getClass())) {
+			return simpleMapForValue(value, name);
+		}
+		return paramsFor(value, name);
+	}
+
 	private static boolean isEnum(Object object) {
-		return  object.getClass().isEnum();
+		return object.getClass().isEnum();
 	}
 
 	private static boolean isList(Object object) {

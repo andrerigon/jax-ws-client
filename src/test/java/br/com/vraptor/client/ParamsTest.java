@@ -2,6 +2,7 @@ package br.com.vraptor.client;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
@@ -68,6 +69,16 @@ public class ParamsTest {
 		Map<String, Object> params = Parameters.paramsFor(sex, "sex");
 
 		assertEquals("MALE", params.get("sex").toString());
+	}
+	
+	@Test
+	public void should_do_nothing_when_inner_objects_are_null() throws Exception{
+		Person p = newPerson("andre", null);
+		
+		Map<String, Object> params = Parameters.paramsFor(p, "person");
+		
+		assertEquals("andre", params.get( "person.name" ));
+		assertFalse( params.containsKey( "person.car" ) );
 	}
 
 	private Person newPerson(String name, Car car) {
