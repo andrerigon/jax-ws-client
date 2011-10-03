@@ -3,11 +3,14 @@ package br.com.vraptor.client;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import net.vidageek.mirror.dsl.Mirror;
+import net.vidageek.mirror.list.dsl.Matcher;
 
 import com.thoughtworks.paranamer.AnnotationParanamer;
 import com.thoughtworks.paranamer.BytecodeReadingParanamer;
@@ -15,10 +18,20 @@ import com.thoughtworks.paranamer.CachingParanamer;
 
 public class Parameters {
 
+	private static final Mirror MIRROR = new Mirror();
+	private static final Matcher<Field> ONLY_INSTANCE_FIELDS_MAPPER = new Matcher<Field>() {
+
+		@Override
+		public boolean accepts(Field field) {
+			return !Modifier.isStatic(field.getModifiers());
+		}
+
+	};
+
 	public static Map<String, Object> paramsFor(Object object, String name)
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
-		if (isWrapperType(object.getClass()) || isList(object)) {
+		if (isWrapperType(object.getClass()) || isList(object) || isEnum(object)) {
 			return simpleMapForValue(object, name);
 		}
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -31,6 +44,10 @@ public class Parameters {
 			}
 		}
 		return params;
+	}
+
+	private static boolean isEnum(Object object) {
+		return  object.getClass().isEnum();
 	}
 
 	private static boolean isList(Object object) {
@@ -49,12 +66,12 @@ public class Parameters {
 	}
 
 	private static Object fieldValue(Object object, Field f) {
-		return new Mirror().on(object).get().field(f.getName());
+		return MIRROR.on(object).get().field(f.getName());
 	}
 
 	private static List<Field> fieldsFrom(Object object) {
-		final List<Field> fields = new Mirror().on(object.getClass())
-				.reflectAll().fields();
+		final List<Field> fields = MIRROR.on(object.getClass()).reflectAll()
+				.fields().matching(ONLY_INSTANCE_FIELDS_MAPPER);
 		return fields;
 	}
 

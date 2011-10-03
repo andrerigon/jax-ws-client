@@ -61,6 +61,15 @@ public class ParamsTest {
 
 	}
 
+	@Test
+	public void should_create_params_from_enum() throws Exception {
+		Sex sex = Sex.MALE;
+
+		Map<String, Object> params = Parameters.paramsFor(sex, "sex");
+
+		assertEquals("MALE", params.get("sex").toString());
+	}
+
 	private Person newPerson(String name, Car car) {
 		Person p = new Person();
 		p.name = name;
@@ -102,6 +111,16 @@ public class ParamsTest {
 			return year;
 		}
 
+	}
+
+	static enum Sex {
+		MALE("M"), FEMALE("F");
+
+		String acronym;
+
+		private Sex(String acronym) {
+			this.acronym = acronym;
+		}
 	}
 
 	void method(String name, int age) {
