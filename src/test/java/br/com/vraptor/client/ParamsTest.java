@@ -49,8 +49,7 @@ public class ParamsTest {
 	}
 
 	@Test
-	public void should_create_params_with_nested_complex_objects()
-			throws Exception {
+	public void should_create_params_with_nested_complex_objects() throws Exception {
 
 		Person p = newPerson("andre", newCar("fusca", 1972));
 
@@ -70,15 +69,15 @@ public class ParamsTest {
 
 		assertEquals("MALE", params.get("sex").toString());
 	}
-	
+
 	@Test
-	public void should_do_nothing_when_inner_objects_are_null() throws Exception{
+	public void should_do_nothing_when_inner_objects_are_null() throws Exception {
 		Person p = newPerson("andre", null);
-		
+
 		Map<String, Object> params = Parameters.paramsFor(p, "person");
-		
-		assertEquals("andre", params.get( "person.name" ));
-		assertFalse( params.containsKey( "person.car" ) );
+
+		assertEquals("andre", params.get("person.name"));
+		assertFalse(params.containsKey("person.car"));
 	}
 
 	private Person newPerson(String name, Car car) {
@@ -138,7 +137,6 @@ public class ParamsTest {
 	}
 
 	private Method sampleMethod() throws Exception {
-		return ParamsTest.class.getDeclaredMethod("method", String.class,
-				int.class);
+		return ParamsTest.class.getDeclaredMethod("method", String.class, int.class);
 	}
 }

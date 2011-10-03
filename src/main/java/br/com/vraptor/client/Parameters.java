@@ -29,25 +29,22 @@ public class Parameters {
 
 	};
 
-	public static Map<String, Object> paramsFor(Object object, String name)
-			throws IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException {
-		if (isWrapperType(object.getClass()) || isList(object)
-				|| isEnum(object)) {
+	public static Map<String, Object> paramsFor(Object object, String name) throws IllegalAccessException,
+			InvocationTargetException, NoSuchMethodException {
+		if (isWrapperType(object.getClass()) || isList(object) || isEnum(object)) {
 			return simpleMapForValue(object, name);
 		}
-		Map<String, Object> params = new HashMap<String, Object>();
+		final Map<String, Object> params = new HashMap<String, Object>();
 		for (Field f : fieldsFrom(object)) {
 			String paramName = paramName(name, f);
-			Object fieldValue = fieldValue(object, f);
-			params.putAll(mapForField(paramName, fieldValue));
+			Object paramValue = fieldValue(object, f);
+			params.putAll(mapForValue(paramName, paramValue));
 		}
 		return params;
 	}
 
-	private static Map<String, Object> mapForField(String name, Object value)
-			throws IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException {
+	private static Map<String, Object> mapForValue(String name, Object value) throws IllegalAccessException,
+			InvocationTargetException, NoSuchMethodException {
 		if (value == null) {
 			return Collections.emptyMap();
 		}
@@ -65,8 +62,7 @@ public class Parameters {
 		return object instanceof List;
 	}
 
-	private static Map<String, Object> simpleMapForValue(Object object,
-			String name) {
+	private static Map<String, Object> simpleMapForValue(Object object, String name) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(name, object);
 		return map;
@@ -81,8 +77,8 @@ public class Parameters {
 	}
 
 	private static List<Field> fieldsFrom(Object object) {
-		final List<Field> fields = MIRROR.on(object.getClass()).reflectAll()
-				.fields().matching(ONLY_INSTANCE_FIELDS_MAPPER);
+		final List<Field> fields = MIRROR.on(object.getClass()).reflectAll().fields()
+				.matching(ONLY_INSTANCE_FIELDS_MAPPER);
 		return fields;
 	}
 
@@ -112,8 +108,7 @@ public class Parameters {
 	}
 
 	public static String[] namesFor(Method m) {
-		final CachingParanamer c = new CachingParanamer(
-				new AnnotationParanamer(new BytecodeReadingParanamer()));
+		final CachingParanamer c = new CachingParanamer(new AnnotationParanamer(new BytecodeReadingParanamer()));
 		return c.lookupParameterNames(m);
 	}
 }

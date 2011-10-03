@@ -66,7 +66,6 @@ public class RequestTest {
 
 	}
 
-
 	@Test
 	@SuppressWarnings("unchecked")
 	public void should_extract_correct_info_and_make_a_request_using_path_params() throws Throwable {

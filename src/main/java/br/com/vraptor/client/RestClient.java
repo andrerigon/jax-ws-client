@@ -14,7 +14,8 @@ public interface RestClient {
 
 	String post(String path, Map<String, Object> map) throws Exception;
 
-	HttpResponse postWithHttpResponse(String path, Map<String, String> params, Map<String, String> headers) throws Exception;
+	HttpResponse postWithHttpResponse(String path, Map<String, String> params, Map<String, String> headers)
+			throws Exception;
 
 	String postMultiPartFormData(String path, Map<String, Object> params, Map<String, String> headers) throws Exception;
 

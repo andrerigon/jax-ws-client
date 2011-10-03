@@ -23,7 +23,7 @@ enum HttpMethod {
 		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
 			return restClient.post(requestInfo.getPath(), requestInfo.getParams());
 		}
-		
+
 	},
 	DELETE {
 
