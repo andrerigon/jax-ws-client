@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +30,7 @@ public class ParamsTest {
 
 	@Test
 	public void should_create_params_map_with_complex_object() throws Exception {
-		Car car = new Car();
-		car.model = "fusca";
-		car.year = 1972;
+		Car car = newCar("fusca", 1972);
 
 		Map<String, Object> params = Parameters.paramsFor(car, "car");
 
@@ -42,9 +40,7 @@ public class ParamsTest {
 
 	@Test
 	public void should_create_params_map_with_list() throws Exception {
-		final List<String> carList = new ArrayList<String>();
-		carList.add("mustang");
-		carList.add("camaro");
+		final List<String> carList = Arrays.asList("mustang", "camaro");
 
 		Map<String, Object> params = Parameters.paramsFor(carList, "carList");
 
@@ -54,19 +50,29 @@ public class ParamsTest {
 	@Test
 	public void should_create_params_with_nested_complex_objects()
 			throws Exception {
-		Car car = new Car();
-		car.model = "fusca";
-		car.year = 1972;
 
-		Person p = new Person();
-		p.name = "andre";
-		p.car = car;
+		Person p = newPerson("andre", newCar("fusca", 1972));
 
 		Map<String, Object> params = Parameters.paramsFor(p, "person");
 
 		assertEquals("andre", params.get("person.name"));
 		assertEquals("fusca", params.get("person.car.model"));
 		assertEquals(1972, params.get("person.car.year"));
+
+	}
+
+	private Person newPerson(String name, Car car) {
+		Person p = new Person();
+		p.name = name;
+		p.car = car;
+		return p;
+	}
+
+	private Car newCar(String model, int year) {
+		Car car = new Car();
+		car.model = model;
+		car.year = year;
+		return car;
 
 	}
 
