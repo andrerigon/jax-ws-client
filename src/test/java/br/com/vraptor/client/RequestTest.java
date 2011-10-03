@@ -161,7 +161,7 @@ public class RequestTest {
 			public boolean matches(Object item) {
 				@SuppressWarnings("unchecked")
 				Map<String, Object> map = (Map<String, Object>) item;
-				return map.containsKey(key) && value.toString().equals(map.get(key));
+				return map.containsKey(key) && value.toString().equals(map.get(key).toString());
 			}
 
 			@Override

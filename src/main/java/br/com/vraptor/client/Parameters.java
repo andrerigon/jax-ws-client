@@ -1,14 +1,13 @@
 package br.com.vraptor.client;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.commons.beanutils.BeanUtils;
+import net.vidageek.mirror.dsl.Mirror;
 
 import com.thoughtworks.paranamer.AnnotationParanamer;
 import com.thoughtworks.paranamer.BytecodeReadingParanamer;
@@ -16,25 +15,47 @@ import com.thoughtworks.paranamer.CachingParanamer;
 
 public class Parameters {
 
-	public static Map<String, Object> paramsFor(Object object, String name) throws IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException {
-		if (isWrapperType(object.getClass())) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(name, object.toString());
-			return map;
+	public static Map<String, Object> paramsFor(Object object, String name)
+			throws IllegalAccessException, InvocationTargetException,
+			NoSuchMethodException {
+		if (isWrapperType(object.getClass()) || isList(object)) {
+			return simpleMapForValue(object, name);
 		}
 		Map<String, Object> params = new HashMap<String, Object>();
-		if (object instanceof List) {
-			params.put(name, (List<?>) object);
-		} else {
-			@SuppressWarnings("unchecked")
-			final Map<String, String> beanMap = (Map<String, String>) BeanUtils.describe(object);
-			beanMap.remove("class");
-			for (Entry<String, String> entry : beanMap.entrySet()) {
-				params.put(String.format("%s.%s", name, entry.getKey()), entry.getValue());
+		for (Field f : fieldsFrom(object)) {
+			if (isWrapperType(f.getType())) {
+				params.put(paramName(name, f), fieldValue(object, f));
+			} else {
+				params.putAll(paramsFor(fieldValue(object, f),
+						paramName(name, f)));
 			}
 		}
 		return params;
+	}
+
+	private static boolean isList(Object object) {
+		return object instanceof List;
+	}
+
+	private static Map<String, Object> simpleMapForValue(Object object,
+			String name) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(name, object);
+		return map;
+	}
+
+	private static String paramName(String name, Field f) {
+		return String.format("%s.%s", name, f.getName());
+	}
+
+	private static Object fieldValue(Object object, Field f) {
+		return new Mirror().on(object).get().field(f.getName());
+	}
+
+	private static List<Field> fieldsFrom(Object object) {
+		final List<Field> fields = new Mirror().on(object.getClass())
+				.reflectAll().fields();
+		return fields;
 	}
 
 	private static final HashSet<Class<?>> WRAPPER_TYPES = getWrapperTypes();
@@ -55,11 +76,16 @@ public class Parameters {
 		ret.add(Double.class);
 		ret.add(Void.class);
 		ret.add(String.class);
+		ret.add(int.class);
+		ret.add(long.class);
+		ret.add(double.class);
+		ret.add(char.class);
 		return ret;
 	}
 
 	public static String[] namesFor(Method m) {
-		final CachingParanamer c = new CachingParanamer(new AnnotationParanamer(new BytecodeReadingParanamer()));
+		final CachingParanamer c = new CachingParanamer(
+				new AnnotationParanamer(new BytecodeReadingParanamer()));
 		return c.lookupParameterNames(m);
 	}
 }

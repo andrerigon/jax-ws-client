@@ -37,7 +37,7 @@ public class ParamsTest {
 		Map<String, Object> params = Parameters.paramsFor(car, "car");
 
 		assertEquals("fusca", params.get("car.model"));
-		assertEquals("1972", params.get("car.year"));
+		assertEquals(1972, params.get("car.year"));
 	}
 
 	@Test
@@ -49,6 +49,25 @@ public class ParamsTest {
 		Map<String, Object> params = Parameters.paramsFor(carList, "carList");
 
 		assertTrue(params.containsValue(carList));
+	}
+
+	@Test
+	public void should_create_params_with_nested_complex_objects()
+			throws Exception {
+		Car car = new Car();
+		car.model = "fusca";
+		car.year = 1972;
+
+		Person p = new Person();
+		p.name = "andre";
+		p.car = car;
+
+		Map<String, Object> params = Parameters.paramsFor(p, "person");
+
+		assertEquals("andre", params.get("person.name"));
+		assertEquals("fusca", params.get("person.car.model"));
+		assertEquals(1972, params.get("person.car.year"));
+
 	}
 
 	public static class Person {
@@ -83,6 +102,7 @@ public class ParamsTest {
 	}
 
 	private Method sampleMethod() throws Exception {
-		return ParamsTest.class.getDeclaredMethod("method", String.class, int.class);
+		return ParamsTest.class.getDeclaredMethod("method", String.class,
+				int.class);
 	}
 }
