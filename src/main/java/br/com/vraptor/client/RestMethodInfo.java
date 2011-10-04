@@ -18,13 +18,17 @@ public class RestMethodInfo {
 	private HttpMethod httpMethod;
 
 	public RestMethodInfo(Method method, String basePath) {
-		this.path = removeDoubleDashes(basePath + topLevelPath(method) + pathFrom(method));
+		this.path = buildMethodPath(method, basePath);
 		this.parametersNames = new LinkedList<String>(Arrays.asList(Parameters.namesFor(method)));
 		this.httpMethod = HttpMethod.fromMethod(method);
 	}
 
-	private String removeDoubleDashes(String path) {
-		return path.replaceAll( "//" , "/");
+	private String buildMethodPath(Method method, String basePath) {
+		return removeDoubleSlashes(basePath + "/" + topLevelPath(method) + "/"+  pathFrom(method));
+	}
+
+	private String removeDoubleSlashes(String path) {
+		return path.replaceAll( "/+" , "/");
 	}
 
 	private String topLevelPath(Method method) {
