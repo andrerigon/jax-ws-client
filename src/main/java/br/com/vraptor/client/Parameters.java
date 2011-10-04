@@ -55,7 +55,7 @@ public class Parameters {
 	}
 
 	private static boolean isEnum(Object object) {
-		return object.getClass().isEnum();
+		return object.getClass().isEnum() || object.getClass().getEnclosingClass().isEnum();
 	}
 
 	private static boolean isList(Object object) {

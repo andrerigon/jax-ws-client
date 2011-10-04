@@ -63,11 +63,18 @@ public class ParamsTest {
 
 	@Test
 	public void should_create_params_from_enum() throws Exception {
-		Sex sex = Sex.MALE;
 
-		Map<String, Object> params = Parameters.paramsFor(sex, "sex");
+		Map<String, Object> params = Parameters.paramsFor(Sex.MALE, "sex");
 
 		assertEquals("MALE", params.get("sex").toString());
+	}
+
+	@Test
+	public void should_create_params_from_enum_with_override() throws Exception{
+		Map<String, Object> params = Parameters.paramsFor(Sex.FEMALE, "sex");
+
+		assertEquals("FEMALE", params.get("sex").toString());
+
 	}
 
 	@Test
@@ -123,13 +130,16 @@ public class ParamsTest {
 
 	}
 
-	static enum Sex {
-		MALE("M"), FEMALE("F");
+	public static enum Sex {
+		MALE, FEMALE {
+			@Override
+			public boolean isComplex() {
+				return true;
+			}
+		};
 
-		String acronym;
-
-		private Sex(String acronym) {
-			this.acronym = acronym;
+		public boolean isComplex() {
+			return false;
 		}
 	}
 
