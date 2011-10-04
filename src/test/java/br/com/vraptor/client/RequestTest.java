@@ -7,25 +7,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static br.com.vraptor.client.test.data.Samples.*;
+import static br.com.vraptor.client.test.util.CustomMatchers.*;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 
-import javax.inject.Named;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import br.com.caelum.vraptor.Delete;
-import br.com.caelum.vraptor.Get;
-import br.com.caelum.vraptor.Path;
-import br.com.caelum.vraptor.Put;
 import br.com.vraptor.client.handler.RestProxyHandler;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -119,83 +110,17 @@ public class RequestTest {
 		verify(client).get(eq(path + "regex-complex/314159265/ALL/666/GONE/271828183/TO/haihai/HELL"), anyMap());
 
 	}
-
-	private Method sampleMethodWithRegex() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testWithRegex", int.class);
-	}
-
-	private Method sampleMethodWithRegexComplex() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testWithRegexComplex", int.class, int.class, int.class,
-				String.class);
-	}
-
-	private Method samplePutMethod() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testPut", int.class);
-	}
-
-	private Method sampleMethodWithParamInThePath() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testPathWithParam", String.class, String.class);
-	}
-
-	private Method sampleDeleteMethod() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testDelete", int.class);
-	}
-
-	private Method samplePathMethod() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testPath", String.class);
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void should_extract_correct_info_when_path_annotation_in_class_level() throws Throwable{
+		restProxyHandler().invoke(null, sampleMethodWithPathInClassLevel(),
+				new Object[] { "palmeiras" });
+		
+		verify( client ).get( eq(path + "prefix/testGet") , anyMap());
 	}
 
 	private RestProxyHandler restProxyHandler() {
 		return new RestProxyHandler(client, path, resultParser);
 	}
-
-	private Method sampleGetMethod() throws SecurityException, NoSuchMethodException {
-		return SampleService.class.getDeclaredMethod("testGet", String.class);
-	}
-
-	private Map<String, Object> aMapWithKeyValue(final String key, final Object value) {
-		return Matchers.argThat(new BaseMatcher<Map<String, Object>>() {
-
-			@Override
-			public boolean matches(Object item) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> map = (Map<String, Object>) item;
-				return map.containsKey(key) && value.toString().equals(map.get(key).toString());
-			}
-
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("a map containing key: " + key + " and value: " + value);
-			}
-		});
-	}
-
-}
-
-interface SampleService {
-
-	@Get("testGet")
-	public void testGet(@Named("name") String name);
-
-	@Path("testPath")
-	public void testPath(@Named("name") String name);
-
-	@Delete("testDelete")
-	void testDelete(@Named("id") int id);
-
-	@Put("testPut")
-	void testPut(@Named("id") int id);
-
-	@Path("bla/{id}/{name}")
-	void testPathWithParam(@Named("id") String id, @Named("name") String name);
-
-	@Get("regex/{id:[0-9]*{0}}/bla")
-	void testWithRegex(@Named("id") int id);
-
-	@Get("regex-complex/{all:[0-9]*{0}}/ALL/{gone:[0-9]*}/GONE/{to:[0-9]*}/TO/{hell:[a-zA-Z0-9]*}/HELL")
-	void testWithRegexComplex(@Named("all") int all, @Named("gone") int gone, @Named("to") int to,
-			@Named("hell") String hell);
-
-	@Get("regex-query/{test:[0-9]+}/xit")
-	void testWithQueryString(@Named("test") Long test, @Named("query") List<Long> query);
 }

@@ -18,9 +18,21 @@ public class RestMethodInfo {
 	private HttpMethod httpMethod;
 
 	public RestMethodInfo(Method method, String basePath) {
-		this.path = basePath + pathFrom(method);
+		this.path = removeDoubleDashes(basePath + topLevelPath(method) + pathFrom(method));
 		this.parametersNames = new LinkedList<String>(Arrays.asList(Parameters.namesFor(method)));
 		this.httpMethod = HttpMethod.fromMethod(method);
+	}
+
+	private String removeDoubleDashes(String path) {
+		return path.replaceAll( "//" , "/");
+	}
+
+	private String topLevelPath(Method method) {
+		Class<?> clazz = method.getDeclaringClass();
+		if (!clazz.isAnnotationPresent(Path.class)) {
+			return "";
+		}
+		return clazz.getAnnotation(Path.class).value()[0];
 	}
 
 	public String invoke(RestClient restClient, Object[] args) throws Exception {
