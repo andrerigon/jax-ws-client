@@ -29,12 +29,7 @@ class RequestInfo {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (int i = 0; i < names.size(); i++) {
 			try {
-				Object argument = args[i];
-				if (argument != null) {
-					map.putAll(Parameters.paramsFor(args[i], names.get(i)));
-				} else {
-					map.putAll(Parameters.paramsFor("", names.get(i)));
-				}
+				map.putAll(Parameters.paramsFor(args[i], names.get(i)));
 			} catch (Exception e) {
 				throw new IllegalArgumentException("could not obtain params");
 			}
@@ -48,7 +43,8 @@ class RequestInfo {
 
 		for (String name : params.keySet()) {
 			if (paramExistsInPath(path, name)) {
-				path = path.replaceAll(regex(path, name), params.get(name).toString());
+				Object paramValue = params.get(name);
+				path = path.replaceAll(regex(path, name), paramValue == null ?  "" : params.get(name).toString());
 				pathParams.add(name);
 			}
 		}

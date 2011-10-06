@@ -31,7 +31,7 @@ public class Parameters {
 
 	public static Map<String, Object> paramsFor(Object object, String name) throws IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException {
-		if (isWrapperType(object.getClass()) || isList(object) || isEnum(object)) {
+		if (object == null || isWrapperType(object.getClass()) || isList(object) || isEnum(object)) {
 			return simpleMapForValue(object, name);
 		}
 		final Map<String, Object> params = new HashMap<String, Object>();
