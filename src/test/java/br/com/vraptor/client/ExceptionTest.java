@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import br.com.vraptor.client.handler.RestProxyHandler;
+import br.com.vraptor.client.test.data.CheckedException;
 import br.com.vraptor.client.test.data.SampleService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,7 +39,7 @@ public class ExceptionTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void should_propagate_correct_exception() throws Throwable {
+	public void should_propagate_correct_runtime_exception() throws Throwable {
 
 		IllegalArgumentException ex = new IllegalArgumentException();
 
@@ -48,8 +49,20 @@ public class ExceptionTest {
 
 		sampleService().testGet("andre");
 	}
+	
+	@Test(expected = CheckedException.class)
+	public void should_propagate_correct_checked_exception() throws Throwable {
 
-	private void throw_inside_result_parser(IllegalArgumentException ex) throws Throwable, NoSuchMethodException {
+		CheckedException ex = new CheckedException();
+
+		throw_inside_client(ex);
+
+		throw_inside_result_parser(ex);
+
+		sampleService().testGet("andre");
+	}
+
+	private void throw_inside_result_parser(Exception ex) throws Throwable, NoSuchMethodException {
 		doThrow(ex).when(resultParser).dealWith(eq(ex), eq(sampleGetMethod()), any(RestMethodInfo.class));
 	}
 
