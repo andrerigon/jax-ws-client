@@ -2,11 +2,6 @@ package br.com.vraptor.client.test.data;
 
 import java.lang.reflect.Method;
 
-import javax.inject.Named;
-
-import br.com.caelum.vraptor.Get;
-import br.com.caelum.vraptor.Path;
-
 public class Samples {
 
 	public static Method sampleMethodWithRegex() throws SecurityException, NoSuchMethodException {
@@ -42,11 +37,5 @@ public class Samples {
 		return WithPathSampleService.class.getMethod("testGet", String.class);
 	}
 
-}
-
-@Path("/prefix")
-interface WithPathSampleService {
-	@Get("/testGet")
-	public void testGet(@Named("name") String name);
 }
 
