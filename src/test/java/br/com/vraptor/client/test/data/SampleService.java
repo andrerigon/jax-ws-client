@@ -12,7 +12,7 @@ import br.com.caelum.vraptor.Put;
 public interface SampleService {
 
 	@Get("testGet")
-	public void testGet(@Named("name") String name) throws IllegalArgumentException, CheckedException;
+	public void testGet(@Named("name") String name) throws CheckedException;
 
 	@Path("testPath")
 	public void testPath(@Named("name") String name);
