@@ -11,13 +11,13 @@ import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Put;
 
-public class RestMethodInfo {
+public class RestMethod {
 
 	private String path;
 	private List<String> parametersNames;
 	private HttpMethod httpMethod;
 
-	public RestMethodInfo(Method method, String basePath) {
+	public RestMethod(Method method, String basePath) {
 		this.path = buildMethodPath(method, basePath);
 		this.parametersNames = new LinkedList<String>(Arrays.asList(Parameters.namesFor(method)));
 		this.httpMethod = HttpMethod.fromMethod(method);

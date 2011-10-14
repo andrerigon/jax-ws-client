@@ -7,6 +7,6 @@ public interface ResultParser {
 
 	<T> T parse(String result, Type resultType);
 
-	Object dealWith(Throwable e, Method method, RestMethodInfo info) throws Throwable;
+	Object dealWith(Throwable e, Method method, RestMethod info) throws Throwable;
 
 }

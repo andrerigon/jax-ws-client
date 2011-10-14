@@ -35,7 +35,7 @@ public class ExceptionTest {
 
 		sampleService().testGet("andre");
 
-		verify(resultParser).dealWith(eq(ex), eq(sampleGetMethod()), any(RestMethodInfo.class));
+		verify(resultParser).dealWith(eq(ex), eq(sampleGetMethod()), any(RestMethod.class));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -63,7 +63,7 @@ public class ExceptionTest {
 	}
 
 	private void throw_inside_result_parser(Exception ex) throws Throwable, NoSuchMethodException {
-		doThrow(ex).when(resultParser).dealWith(eq(ex), eq(sampleGetMethod()), any(RestMethodInfo.class));
+		doThrow(ex).when(resultParser).dealWith(eq(ex), eq(sampleGetMethod()), any(RestMethod.class));
 	}
 
 	@SuppressWarnings("unchecked")

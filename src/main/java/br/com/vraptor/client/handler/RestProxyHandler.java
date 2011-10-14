@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.vraptor.client.RestClient;
-import br.com.vraptor.client.RestMethodInfo;
+import br.com.vraptor.client.RestMethod;
 import br.com.vraptor.client.ResultParser;
 
 public class RestProxyHandler implements InvocationHandler {
@@ -15,7 +15,7 @@ public class RestProxyHandler implements InvocationHandler {
 
 	private final String basePath;
 
-	private Map<Method, RestMethodInfo> cache = new HashMap<Method, RestMethodInfo>();
+	private Map<Method, RestMethod> cache = new HashMap<Method, RestMethod>();
 
 	private final ResultParser parser;
 
@@ -33,12 +33,12 @@ public class RestProxyHandler implements InvocationHandler {
 		if (toString(method)) {
 			return "[vraptor-client] proxy for " + interfaceName(proxy);
 		}
-		RestMethodInfo info = findMethodInfo(method);
+		RestMethod restMethod = restMethodFrom(method);
 		try {
-			final String result = info.invoke(restClient, args);
+			final String result = restMethod.invoke(restClient, args);
 			return parser.parse(result, method.getGenericReturnType());
 		} catch (Throwable e) {
-			return parser.dealWith(e, method, info);
+			return parser.dealWith(e, method, restMethod);
 		}
 	}
 
@@ -54,9 +54,9 @@ public class RestProxyHandler implements InvocationHandler {
 		return method.getName().equals("equals");
 	}
 
-	private RestMethodInfo findMethodInfo(Method method) {
+	private RestMethod restMethodFrom(Method method) {
 		if (!cache.containsKey(method)) {
-			cache.put(method, new RestMethodInfo(method, basePath));
+			cache.put(method, new RestMethod(method, basePath));
 		}
 		return cache.get(method);
 	}
