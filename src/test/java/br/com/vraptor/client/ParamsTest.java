@@ -6,11 +6,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+
+import br.com.vraptor.client.params.ParameterInfo;
+import br.com.vraptor.client.params.Parameters;
+
+import com.google.common.collect.ImmutableList;
 
 public class ParamsTest {
 
@@ -18,7 +24,15 @@ public class ParamsTest {
 
 	@Test
 	public void should_list_method_params_names() throws Exception {
-		assertArrayEquals(names, Parameters.namesFor(sampleMethod()));
+		assertArrayEquals(names, names(Parameters.paramsInfoFor(sampleMethod())));
+	}
+
+	private Object[] names(ImmutableList<ParameterInfo> paramsInfo) {
+		List<String> list = new ArrayList<String>();
+		for( ParameterInfo info : paramsInfo ){
+			list.add( info.name());
+		}
+		return list.toArray();
 	}
 
 	@Test
@@ -70,7 +84,7 @@ public class ParamsTest {
 	}
 
 	@Test
-	public void should_create_params_from_enum_with_override() throws Exception{
+	public void should_create_params_from_enum_with_override() throws Exception {
 		Map<String, Object> params = Parameters.paramsFor(Sex.FEMALE, "sex");
 
 		assertEquals("FEMALE", params.get("sex").toString());

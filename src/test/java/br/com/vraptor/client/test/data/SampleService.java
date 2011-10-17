@@ -8,6 +8,7 @@ import br.com.caelum.vraptor.Delete;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Put;
+import br.com.caelum.vraptor.util.hibernate.extra.Load;
 
 public interface SampleService {
 
@@ -35,4 +36,8 @@ public interface SampleService {
 
 	@Get("regex-query/{test:[0-9]+}/xit")
 	void testWithQueryString(@Named("test") Long test, @Named("query") List<Long> query);
+
+	@Get("/load/{entity.id}")
+	void test_find_by_id(@Load @Named("entity") Entity entity);
+
 }

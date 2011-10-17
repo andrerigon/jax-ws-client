@@ -1,34 +1,35 @@
 package br.com.vraptor.client;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import br.com.caelum.vraptor.Delete;
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Put;
+import br.com.vraptor.client.params.ParameterInfo;
+import br.com.vraptor.client.params.Parameters;
+
+import com.google.common.collect.ImmutableList;
 
 public class RestMethod {
 
 	private String path;
-	private List<String> parametersNames;
+	private ImmutableList<ParameterInfo> parametersInfo;
 	private HttpMethod httpMethod;
 
 	public RestMethod(Method method, String basePath) {
 		this.path = buildMethodPath(method, basePath);
-		this.parametersNames = new LinkedList<String>(Arrays.asList(Parameters.namesFor(method)));
+		this.parametersInfo = Parameters.paramsInfoFor(method);
 		this.httpMethod = HttpMethod.fromMethod(method);
 	}
 
 	private String buildMethodPath(Method method, String basePath) {
-		return removeDoubleSlashes(basePath + "/" + topLevelPath(method) + "/"+  pathFrom(method));
+		return removeDoubleSlashes(basePath + "/" + topLevelPath(method) + "/" + pathFrom(method));
 	}
 
 	private String removeDoubleSlashes(String path) {
-		return path.replaceAll( "/+" , "/");
+		return path.replaceAll("/+", "/");
 	}
 
 	private String topLevelPath(Method method) {
@@ -40,7 +41,7 @@ public class RestMethod {
 	}
 
 	public String invoke(RestClient restClient, Object[] args) throws Exception {
-		return httpMethod.request(new RequestInfo(path, parametersNames, args), restClient);
+		return httpMethod.request(new RequestInfo(path, parametersInfo, args), restClient);
 	}
 
 	private static String pathFrom(Method method) {
@@ -65,17 +66,13 @@ public class RestMethod {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("RestMethodInfo [path=").append(path).append(", parametersNames=").append(parametersNames)
+		builder.append("RestMethodInfo [path=").append(path).append(", parametersNames=").append(parametersInfo)
 				.append(", httpMethod=").append(httpMethod).append("]");
 		return builder.toString();
 	}
 
 	public String getPath() {
 		return path;
-	}
-
-	public List<String> getParametersNames() {
-		return parametersNames;
 	}
 
 	public String getHttpMethod() {

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import br.com.vraptor.client.handler.RestProxyHandler;
+import br.com.vraptor.client.test.data.Entity;
 import br.com.vraptor.client.test.data.SampleService;
 import br.com.vraptor.client.test.data.WithPathSampleService;
 
@@ -101,6 +103,15 @@ public class RequestTest {
 		sampleServiceFor(WithPathSampleService.class).testGet("");
 
 		verify(client).get(eq(path + "prefix/testGet"), anyMap());
+	}
+
+	@Test
+	public void should_send_id_when_using_load_annotation() throws Throwable {
+		Entity entity = new Entity("123", "aaa");
+
+		sampleServiceFor(SampleService.class).test_find_by_id(entity);
+
+		verify(client).get(eq(path + "load/123"), eq(Collections.<String,Object>emptyMap()));
 	}
 
 	@SuppressWarnings({ "unchecked" })

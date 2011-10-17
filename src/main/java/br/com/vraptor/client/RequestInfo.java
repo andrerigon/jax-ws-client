@@ -7,14 +7,17 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import br.com.vraptor.client.params.ParameterInfo;
+import br.com.vraptor.client.params.Parameters;
+
 class RequestInfo {
 
 	private String path;
 	private Map<String, Object> params;
 
-	public RequestInfo(String path, List<String> parametersNames, Object[] args) {
-		this.params = paramsMap(parametersNames, args);
-		this.path = requestPath(path, params);
+	public RequestInfo(String path, List<ParameterInfo> parametersInfo, Object[] args) {
+		this.params = paramsMap(parametersInfo, args);
+		this.path = requestPath(path, params, parametersInfo);
 	}
 
 	public String getPath() {
@@ -25,11 +28,11 @@ class RequestInfo {
 		return params;
 	}
 
-	protected Map<String, Object> paramsMap(List<String> names, Object[] args) {
+	protected Map<String, Object> paramsMap(List<ParameterInfo> names, Object[] args) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (int i = 0; i < names.size(); i++) {
 			try {
-				map.putAll(Parameters.paramsFor(args[i], names.get(i)));
+				map.putAll(Parameters.paramsFor(args[i], names.get(i).name()));
 			} catch (Exception e) {
 				throw new IllegalArgumentException("could not obtain params");
 			}
@@ -38,18 +41,44 @@ class RequestInfo {
 
 	}
 
-	protected String requestPath(String path, Map<String, Object> params) {
+	protected String requestPath(String path, Map<String, Object> params, List<ParameterInfo> parametersInfo) {
+		removeParamsWithLoadAnnotation(path, params, parametersInfo);
+
 		Set<String> pathParams = new LinkedHashSet<String>();
 
 		for (String name : params.keySet()) {
 			if (paramExistsInPath(path, name)) {
 				Object paramValue = params.get(name);
-				path = path.replaceAll(regex(path, name), paramValue == null ?  "" : params.get(name).toString());
+				path = path.replaceAll(regex(path, name), paramValue == null ? "" : params.get(name).toString());
 				pathParams.add(name);
 			}
 		}
 		removeParams(pathParams, params);
 		return path;
+	}
+
+	private void removeParamsWithLoadAnnotation(String path, Map<String, Object> params,
+			List<ParameterInfo> parametersInfo) {
+		Set<String> toRemove = new LinkedHashSet<String>();
+		int i = 0;
+		for (String name : params.keySet()) {
+			if (!paramExistsInPath(path, name) && uselessParameter(name, parametersInfo.get(i++))) {
+				toRemove.add(name);
+			}
+		}
+		removeParams(toRemove, params);
+	}
+
+	private boolean uselessParameter(String name, ParameterInfo parameterInfo) {
+		if (hasLoadAnnotation(parameterInfo) && name.startsWith(parameterInfo.name())) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean hasLoadAnnotation(ParameterInfo parameterInfo) {
+		return parameterInfo.hasAnnotation(br.com.caelum.vraptor.util.hibernate.extra.Load.class)
+				|| parameterInfo.hasAnnotation(br.com.caelum.vraptor.util.jpa.extra.Load.class);
 	}
 
 	private boolean paramExistsInPath(String path, String name) {

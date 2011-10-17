@@ -1,9 +1,11 @@
-package br.com.vraptor.client;
+package br.com.vraptor.client.params;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import java.util.Map;
 import net.vidageek.mirror.dsl.Mirror;
 import net.vidageek.mirror.list.dsl.Matcher;
 
+import com.google.common.collect.ImmutableList;
 import com.thoughtworks.paranamer.AnnotationParanamer;
 import com.thoughtworks.paranamer.BytecodeReadingParanamer;
 import com.thoughtworks.paranamer.CachingParanamer;
@@ -107,8 +110,19 @@ public class Parameters {
 		return ret;
 	}
 
-	public static String[] namesFor(Method m) {
+	public static ImmutableList<ParameterInfo> paramsInfoFor(Method m) {
 		final CachingParanamer c = new CachingParanamer(new AnnotationParanamer(new BytecodeReadingParanamer()));
-		return c.lookupParameterNames(m);
+		String[] names = c.lookupParameterNames(m);
+		Annotation[][] annotations = m.getParameterAnnotations();
+		return ImmutableList.copyOf(parameterInfoList(names, annotations));
+	}
+
+	private static List<ParameterInfo> parameterInfoList(String[] names, Annotation[][] annotations) {
+		List<ParameterInfo> list = new ArrayList<ParameterInfo>(names.length);
+		int i = -1;
+		while (++i < names.length) {
+			list.add(new ParameterInfo(names[i], annotations[i]));
+		}
+		return list;
 	}
 }

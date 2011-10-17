@@ -4,7 +4,7 @@
 
 	<groupId>vraptor-client</groupId>
 	<artifactId>vraptor-client</artifactId>
-	<version>1.3</version>
+	<version>1.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>vraptor-client</name>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>br.com.caelum</groupId>
 			<artifactId>vraptor</artifactId>
-			<version>3.3.0</version>
+			<version>3.4.0</version>
 			<scope>provided</scope>
 		</dependency>
 
