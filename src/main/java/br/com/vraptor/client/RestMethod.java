@@ -78,5 +78,9 @@ public class RestMethod {
 	public String getHttpMethod() {
 		return httpMethod.toString();
 	}
+	
+	public ImmutableList<ParameterInfo> parametersInfo(){
+		return parametersInfo;
+	}
 
 }
