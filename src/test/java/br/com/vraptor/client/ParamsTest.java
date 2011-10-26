@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,6 +100,15 @@ public class ParamsTest {
 
 		assertEquals("andre", params.get("person.name"));
 		assertFalse(params.containsKey("person.car"));
+	}
+	
+	@Test
+	public void should_not_send_null_list_params() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException{
+		final List<String> carList = null;
+
+		Map<String, Object> params = Parameters.paramsFor(carList, "carList");
+
+		assertFalse(params.containsKey("carList"));
 	}
 
 	private Person newPerson(String name, Car car) {

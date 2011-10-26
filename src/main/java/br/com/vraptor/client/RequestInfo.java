@@ -32,7 +32,9 @@ class RequestInfo {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (int i = 0; i < names.size(); i++) {
 			try {
-				map.putAll(Parameters.paramsFor(args[i], names.get(i).name()));
+				if (args[i] != null) {
+					map.putAll(Parameters.paramsFor(args[i], names.get(i).name()));
+				}
 			} catch (Exception e) {
 				throw new IllegalArgumentException("could not obtain params");
 			}
