@@ -7,12 +7,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.URIException;
 import org.junit.Test;
+
+import sun.io.CharacterEncoding;
 
 import br.com.vraptor.client.params.ParameterInfo;
 import br.com.vraptor.client.params.Parameters;
@@ -30,8 +35,8 @@ public class ParamsTest {
 
 	private Object[] names(ImmutableList<ParameterInfo> paramsInfo) {
 		List<String> list = new ArrayList<String>();
-		for( ParameterInfo info : paramsInfo ){
-			list.add( info.name());
+		for (ParameterInfo info : paramsInfo) {
+			list.add(info.name());
 		}
 		return list.toArray();
 	}
@@ -101,9 +106,10 @@ public class ParamsTest {
 		assertEquals("andre", params.get("person.name"));
 		assertFalse(params.containsKey("person.car"));
 	}
-	
+
 	@Test
-	public void should_not_send_null_list_params() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException{
+	public void should_not_send_null_list_params() throws IllegalAccessException, InvocationTargetException,
+			NoSuchMethodException {
 		final List<String> carList = null;
 
 		Map<String, Object> params = Parameters.paramsFor(carList, "carList");

@@ -1,5 +1,7 @@
 package br.com.vraptor.client;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,7 +17,8 @@ class RequestInfo {
 	private String path;
 	private Map<String, Object> params;
 
-	public RequestInfo(String path, List<ParameterInfo> parametersInfo, Object[] args) {
+	public RequestInfo(String path, List<ParameterInfo> parametersInfo, Object[] args)
+			throws UnsupportedEncodingException {
 		this.params = paramsMap(parametersInfo, args);
 		this.path = requestPath(path, params, parametersInfo);
 	}
@@ -43,7 +46,7 @@ class RequestInfo {
 
 	}
 
-	protected String requestPath(String path, Map<String, Object> params, List<ParameterInfo> parametersInfo) {
+	protected String requestPath(String path, Map<String, Object> params, List<ParameterInfo> parametersInfo) throws UnsupportedEncodingException {
 		removeParamsWithLoadAnnotation(path, params, parametersInfo);
 
 		Set<String> pathParams = new LinkedHashSet<String>();
@@ -51,12 +54,17 @@ class RequestInfo {
 		for (String name : params.keySet()) {
 			if (paramExistsInPath(path, name)) {
 				Object paramValue = params.get(name);
-				path = path.replaceAll(regex(path, name), paramValue == null ? "" : params.get(name).toString());
+				path = path
+						.replaceAll(regex(path, name), paramValue == null ? "" : encode(params.get(name).toString()));
 				pathParams.add(name);
 			}
 		}
 		removeParams(pathParams, params);
 		return path;
+	}
+
+	private String encode(String string) throws UnsupportedEncodingException {
+		return URLEncoder.encode(string, "utf-8");
 	}
 
 	private void removeParamsWithLoadAnnotation(String path, Map<String, Object> params,
