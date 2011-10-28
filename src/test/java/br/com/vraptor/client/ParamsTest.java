@@ -7,17 +7,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLEncoder;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.URIException;
 import org.junit.Test;
-
-import sun.io.CharacterEncoding;
 
 import br.com.vraptor.client.params.ParameterInfo;
 import br.com.vraptor.client.params.Parameters;

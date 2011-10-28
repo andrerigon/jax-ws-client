@@ -20,7 +20,7 @@ class RequestInfo {
 	public RequestInfo(String path, List<ParameterInfo> parametersInfo, Object[] args)
 			throws UnsupportedEncodingException {
 		this.params = paramsMap(parametersInfo, args);
-		this.path = requestPath(path, params, parametersInfo);
+		this.path = UriUtils.removeDoubleSlashes(requestPath(path, params, parametersInfo));
 	}
 
 	public String getPath() {
@@ -46,12 +46,14 @@ class RequestInfo {
 
 	}
 
-	protected String requestPath(String path, Map<String, Object> params, List<ParameterInfo> parametersInfo) throws UnsupportedEncodingException {
+	protected String requestPath(String path, Map<String, Object> params, List<ParameterInfo> parametersInfo)
+			throws UnsupportedEncodingException {
 		removeParamsWithLoadAnnotation(path, params, parametersInfo);
 
 		Set<String> pathParams = new LinkedHashSet<String>();
 
-		for (String name : params.keySet()) {
+		for (ParameterInfo info : parametersInfo) {
+			final String name = info.name();
 			if (paramExistsInPath(path, name)) {
 				Object paramValue = params.get(name);
 				path = path
@@ -70,13 +72,25 @@ class RequestInfo {
 	private void removeParamsWithLoadAnnotation(String path, Map<String, Object> params,
 			List<ParameterInfo> parametersInfo) {
 		Set<String> toRemove = new LinkedHashSet<String>();
-		int i = 0;
-		for (String name : params.keySet()) {
-			if (!paramExistsInPath(path, name) && uselessParameter(name, parametersInfo.get(i++))) {
-				toRemove.add(name);
+		Set<String> paramsNames = parametersNotPresentInPath(path, params.keySet());
+		for (ParameterInfo parameterInfo : parametersInfo) {
+			for (String name : paramsNames) {
+				if (uselessParameter(name, parameterInfo)) {
+					toRemove.add(name);
+				}
 			}
 		}
 		removeParams(toRemove, params);
+	}
+
+	private Set<String> parametersNotPresentInPath(String path, Set<String> params) {
+		Set<String> list = new LinkedHashSet<String>();
+		for (String name : params) {
+			if (!paramExistsInPath(path, name)) {
+				list.add(name);
+			}
+		}
+		return list;
 	}
 
 	private boolean uselessParameter(String name, ParameterInfo parameterInfo) {

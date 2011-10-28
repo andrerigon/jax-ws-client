@@ -25,11 +25,7 @@ public class RestMethod {
 	}
 
 	private String buildMethodPath(Method method, String basePath) {
-		return removeDoubleSlashes(basePath + "/" + topLevelPath(method) + "/" + pathFrom(method));
-	}
-
-	private String removeDoubleSlashes(String path) {
-		return path.replaceAll("/+", "/");
+		return UriUtils.removeDoubleSlashes(basePath + "/" + topLevelPath(method) + "/" + pathFrom(method));
 	}
 
 	private String topLevelPath(Method method) {

@@ -28,7 +28,7 @@ public interface SampleService {
 	void testPathWithParam(@Named("id") String id, @Named("name") String name);
 
 	@Get("regex/{id:[0-9]*{0}}/bla")
-	void testWithRegex(@Named("id") int id);
+	void testWithRegex(@Named("id") Integer id);
 
 	@Get("regex-complex/{all:[0-9]*{0}}/ALL/{gone:[0-9]*}/GONE/{to:[0-9]*}/TO/{hell:[a-zA-Z0-9]*}/HELL")
 	void testWithRegexComplex(@Named("all") int all, @Named("gone") int gone, @Named("to") int to,

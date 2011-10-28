@@ -122,6 +122,16 @@ public class RequestTest {
 
 		verify(client).get(eq(path + "bla/12/and%26re"), anyMap());
 	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void should_build_path_with_regex_and_null_parameter() throws Throwable {
+
+		sampleServiceFor(SampleService.class).testWithRegex(null);
+
+		verify(client).get(eq(path + "regex/bla"), anyMap());
+
+	}
 
 	@SuppressWarnings({ "unchecked" })
 	private <T> T sampleServiceFor(Class<T> clazz) {
