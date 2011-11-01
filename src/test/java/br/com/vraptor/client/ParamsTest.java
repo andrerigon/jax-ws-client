@@ -7,17 +7,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import br.com.vraptor.client.params.ParameterInfo;
 import br.com.vraptor.client.params.Parameters;
-
-import com.google.common.collect.ImmutableList;
+import br.com.vraptor.client.params.ParametersSerializer;
 
 public class ParamsTest {
 
@@ -25,20 +22,12 @@ public class ParamsTest {
 
 	@Test
 	public void should_list_method_params_names() throws Exception {
-		assertArrayEquals(names, names(Parameters.paramsInfoFor(sampleMethod())));
-	}
-
-	private Object[] names(ImmutableList<ParameterInfo> paramsInfo) {
-		List<String> list = new ArrayList<String>();
-		for (ParameterInfo info : paramsInfo) {
-			list.add(info.name());
-		}
-		return list.toArray();
+		assertArrayEquals(names, new Parameters(sampleMethod(), "").names().toArray());
 	}
 
 	@Test
 	public void should_create_params_map_with_simple_value() throws Exception {
-		Map<String, Object> params = Parameters.paramsFor("andre", "name");
+		Map<String, Object> params = ParametersSerializer.paramsFor("andre", "name");
 
 		assertTrue(params.containsKey("name"));
 		assertTrue("andre".equals(params.get("name")));
@@ -48,7 +37,7 @@ public class ParamsTest {
 	public void should_create_params_map_with_complex_object() throws Exception {
 		Car car = newCar("fusca", 1972);
 
-		Map<String, Object> params = Parameters.paramsFor(car, "car");
+		Map<String, Object> params = ParametersSerializer.paramsFor(car, "car");
 
 		assertEquals("fusca", params.get("car.model"));
 		assertEquals(1972, params.get("car.year"));
@@ -58,7 +47,7 @@ public class ParamsTest {
 	public void should_create_params_map_with_list() throws Exception {
 		final List<String> carList = Arrays.asList("mustang", "camaro");
 
-		Map<String, Object> params = Parameters.paramsFor(carList, "carList");
+		Map<String, Object> params = ParametersSerializer.paramsFor(carList, "carList");
 
 		assertTrue(params.containsValue(carList));
 	}
@@ -68,7 +57,7 @@ public class ParamsTest {
 
 		Person p = newPerson("andre", newCar("fusca", 1972));
 
-		Map<String, Object> params = Parameters.paramsFor(p, "person");
+		Map<String, Object> params = ParametersSerializer.paramsFor(p, "person");
 
 		assertEquals("andre", params.get("person.name"));
 		assertEquals("fusca", params.get("person.car.model"));
@@ -79,14 +68,14 @@ public class ParamsTest {
 	@Test
 	public void should_create_params_from_enum() throws Exception {
 
-		Map<String, Object> params = Parameters.paramsFor(Sex.MALE, "sex");
+		Map<String, Object> params = ParametersSerializer.paramsFor(Sex.MALE, "sex");
 
 		assertEquals("MALE", params.get("sex").toString());
 	}
 
 	@Test
 	public void should_create_params_from_enum_with_override() throws Exception {
-		Map<String, Object> params = Parameters.paramsFor(Sex.FEMALE, "sex");
+		Map<String, Object> params = ParametersSerializer.paramsFor(Sex.FEMALE, "sex");
 
 		assertEquals("FEMALE", params.get("sex").toString());
 
@@ -96,7 +85,7 @@ public class ParamsTest {
 	public void should_do_nothing_when_inner_objects_are_null() throws Exception {
 		Person p = newPerson("andre", null);
 
-		Map<String, Object> params = Parameters.paramsFor(p, "person");
+		Map<String, Object> params = ParametersSerializer.paramsFor(p, "person");
 
 		assertEquals("andre", params.get("person.name"));
 		assertFalse(params.containsKey("person.car"));
@@ -107,9 +96,25 @@ public class ParamsTest {
 			NoSuchMethodException {
 		final List<String> carList = null;
 
-		Map<String, Object> params = Parameters.paramsFor(carList, "carList");
+		Map<String, Object> params = ParametersSerializer.paramsFor(carList, "carList");
 
 		assertFalse(params.containsKey("carList"));
+	}
+
+	@Test
+	public void should_serialize_list_with_inner_complex_objects() throws Exception {
+		final List<Person> list = Arrays.asList(newPerson("andre", newCar("chevet", 1976)),
+				newPerson("joao", newCar("fuscao", 1966)));
+
+		Map<String, ?> map = ParametersSerializer.paramsFor(list, "list");
+
+		assertEquals("andre", map.get("list[0].name"));
+		assertEquals("chevet", map.get("list[0].car.model"));
+		assertEquals(1976, map.get("list[0].car.year"));
+
+		assertEquals("joao", map.get("list[1].name"));
+		assertEquals("fuscao", map.get("list[1].car.model"));
+		assertEquals(1966, map.get("list[1].car.year"));
 	}
 
 	private Person newPerson(String name, Car car) {
@@ -139,6 +144,37 @@ public class ParamsTest {
 			return name;
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((car == null) ? 0 : car.hashCode());
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Person other = (Person) obj;
+			if (car == null) {
+				if (other.car != null)
+					return false;
+			} else if (!car.equals(other.car))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+
 	}
 
 	public static class Car {
@@ -151,6 +187,34 @@ public class ParamsTest {
 
 		public int getYear() {
 			return year;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((model == null) ? 0 : model.hashCode());
+			result = prime * result + year;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Car other = (Car) obj;
+			if (model == null) {
+				if (other.model != null)
+					return false;
+			} else if (!model.equals(other.model))
+				return false;
+			if (year != other.year)
+				return false;
+			return true;
 		}
 
 	}

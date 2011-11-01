@@ -7,20 +7,17 @@ import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Put;
-import br.com.vraptor.client.params.ParameterInfo;
 import br.com.vraptor.client.params.Parameters;
-
-import com.google.common.collect.ImmutableList;
 
 public class RestMethod {
 
 	private String path;
-	private ImmutableList<ParameterInfo> parametersInfo;
+	private Parameters parameters;
 	private HttpMethod httpMethod;
 
 	public RestMethod(Method method, String basePath) {
 		this.path = buildMethodPath(method, basePath);
-		this.parametersInfo = Parameters.paramsInfoFor(method);
+		this.parameters = new Parameters(method, path);
 		this.httpMethod = HttpMethod.fromMethod(method);
 	}
 
@@ -37,7 +34,7 @@ public class RestMethod {
 	}
 
 	public String invoke(RestClient restClient, Object[] args) throws Exception {
-		return httpMethod.request(new RequestInfo(path, parametersInfo, args), restClient);
+		return httpMethod.request(new RequestInfo(path, parameters, args), restClient);
 	}
 
 	private static String pathFrom(Method method) {
@@ -62,7 +59,7 @@ public class RestMethod {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("RestMethodInfo [path=").append(path).append(", parametersNames=").append(parametersInfo)
+		builder.append("RestMethodInfo [path=").append(path).append(", parametersNames=").append(parameters)
 				.append(", httpMethod=").append(httpMethod).append("]");
 		return builder.toString();
 	}
@@ -73,10 +70,6 @@ public class RestMethod {
 
 	public String getHttpMethod() {
 		return httpMethod.toString();
-	}
-	
-	public ImmutableList<ParameterInfo> parametersInfo(){
-		return parametersInfo;
 	}
 
 }

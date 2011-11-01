@@ -53,15 +53,4 @@ public final class ParameterInfo {
 		return builder.toString();
 	}
 
-	// @Path("aaaa")
-	// public static void main(String[] args) throws NoSuchMethodException,
-	// SecurityException {
-	// Path load = (Path) ParameterInfo.class.getDeclaredMethod("main", new
-	// Class<?>[] { String[].class })
-	// .getAnnotations()[0];
-	// ParameterInfo parameterInfo = new ParameterInfo("name", load);
-	// System.out.println(parameterInfo.hasAnnotation(Path.class));
-	// System.out.println(parameterInfo.annotation(Path.class).value()[0]);
-	// System.out.println( parameterInfo );
-	// }
 }

@@ -4,23 +4,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
-import br.com.vraptor.client.params.ParameterInfo;
 import br.com.vraptor.client.params.Parameters;
+import br.com.vraptor.client.params.ParametersSerializer;
 
 class RequestInfo {
 
 	private String path;
 	private Map<String, Object> params;
 
-	public RequestInfo(String path, List<ParameterInfo> parametersInfo, Object[] args)
-			throws UnsupportedEncodingException {
-		this.params = paramsMap(parametersInfo, args);
-		this.path = UriUtils.removeDoubleSlashes(requestPath(path, params, parametersInfo));
+	public RequestInfo(String path, Parameters parameters, Object[] args) throws UnsupportedEncodingException {
+		this.params = paramsMap(parameters, args);
+		this.path = UriUtils.removeDoubleSlashes(requestPath(path, params, parameters));
 	}
 
 	public String getPath() {
@@ -31,12 +28,12 @@ class RequestInfo {
 		return params;
 	}
 
-	protected Map<String, Object> paramsMap(List<ParameterInfo> names, Object[] args) {
+	protected Map<String, Object> paramsMap(Parameters parameters, Object[] args) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		for (int i = 0; i < names.size(); i++) {
+		for (int i = 0; i < parameters.size(); i++) {
 			try {
 				if (args[i] != null) {
-					map.putAll(Parameters.paramsFor(args[i], names.get(i).name()));
+					map.putAll(ParametersSerializer.paramsFor(args[i], parameters.name(i)));
 				}
 			} catch (Exception e) {
 				throw new IllegalArgumentException("could not obtain params");
@@ -46,22 +43,30 @@ class RequestInfo {
 
 	}
 
-	protected String requestPath(String path, Map<String, Object> params, List<ParameterInfo> parametersInfo)
+	protected String requestPath(String path, Map<String, Object> params, Parameters parameters)
 			throws UnsupportedEncodingException {
-		removeParamsWithLoadAnnotation(path, params, parametersInfo);
+		removeParamsWithLoadAnnotation(path, params, parameters);
 
 		Set<String> pathParams = new LinkedHashSet<String>();
 
-		for (ParameterInfo info : parametersInfo) {
-			final String name = info.name();
-			if (paramExistsInPath(path, name)) {
+		for (String name : params.keySet()) {
+			if (parameters.isPathParameter(name)) {
 				Object paramValue = params.get(name);
-				path = path
-						.replaceAll(regex(path, name), paramValue == null ? "" : encode(params.get(name).toString()));
+				path = path.replaceAll(Parameters.regex(path, name), paramValue == null ? "" : encode(params.get(name)
+						.toString()));
 				pathParams.add(name);
 			}
 		}
 		removeParams(pathParams, params);
+		return removeNullPathParameters(path, parameters);
+	}
+
+	private String removeNullPathParameters(String path, Parameters parameters) {
+		for (String name : parameters.names()) {
+			if (parameters.isPathParameter(name)) {
+				path = path.replaceAll(Parameters.regex(path, name), "");
+			}
+		}
 		return path;
 	}
 
@@ -69,70 +74,8 @@ class RequestInfo {
 		return URLEncoder.encode(string, "utf-8");
 	}
 
-	private void removeParamsWithLoadAnnotation(String path, Map<String, Object> params,
-			List<ParameterInfo> parametersInfo) {
-		Set<String> toRemove = new LinkedHashSet<String>();
-		Set<String> paramsNames = parametersNotPresentInPath(path, params.keySet());
-		for (ParameterInfo parameterInfo : parametersInfo) {
-			for (String name : paramsNames) {
-				if (uselessParameter(name, parameterInfo)) {
-					toRemove.add(name);
-				}
-			}
-		}
-		removeParams(toRemove, params);
-	}
-
-	private Set<String> parametersNotPresentInPath(String path, Set<String> params) {
-		Set<String> list = new LinkedHashSet<String>();
-		for (String name : params) {
-			if (!paramExistsInPath(path, name)) {
-				list.add(name);
-			}
-		}
-		return list;
-	}
-
-	private boolean uselessParameter(String name, ParameterInfo parameterInfo) {
-		if (hasLoadAnnotation(parameterInfo) && name.startsWith(parameterInfo.name())) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean hasLoadAnnotation(ParameterInfo parameterInfo) {
-		return parameterInfo.hasAnnotation(br.com.caelum.vraptor.util.hibernate.extra.Load.class)
-				|| parameterInfo.hasAnnotation(br.com.caelum.vraptor.util.jpa.extra.Load.class);
-	}
-
-	private boolean paramExistsInPath(String path, String name) {
-		return isJustKey(path, name) || isKeyValue(path, name);
-	}
-
-	private String regex(String path, String name) {
-		if (isJustKey(path, name)) {
-			return regexKey(name);
-		} else if (isKeyValue(path, name)) {
-			return regexKeyValue(name);
-		} else {
-			throw new IllegalStateException();
-		}
-	}
-
-	private boolean isJustKey(String path, String name) {
-		return new Scanner(path).findInLine(regexKey(name)) != null;
-	}
-
-	private boolean isKeyValue(String path, String name) {
-		return new Scanner(path).findInLine(regexKeyValue(name)) != null;
-	}
-
-	private String regexKey(String name) {
-		return String.format("\\{%s\\}", name);
-	}
-
-	private String regexKeyValue(String name) {
-		return "\\{" + name + "\\:?(.*?)[\\}]?\\}";
+	private void removeParamsWithLoadAnnotation(String path, Map<String, Object> params, Parameters parameters) {
+		removeParams(parameters.useless(params.keySet()), params);
 	}
 
 	private void removeParams(Set<String> pathParams, Map<String, Object> params) {
