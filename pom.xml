@@ -22,6 +22,12 @@
 			<artifactId>vraptor</artifactId>
 			<version>3.4.0</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.vidageek</groupId>
+					<artifactId>mirror</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
