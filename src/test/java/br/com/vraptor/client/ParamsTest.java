@@ -105,16 +105,20 @@ public class ParamsTest {
 	public void should_serialize_list_with_inner_complex_objects() throws Exception {
 		final List<Person> list = Arrays.asList(newPerson("andre", newCar("chevet", 1976)),
 				newPerson("joao", newCar("fuscao", 1966)));
+		
+		Group group = new Group(list, "group1");
 
-		Map<String, ?> map = ParametersSerializer.paramsFor(list, "list");
+		Map<String, ?> map = ParametersSerializer.paramsFor(group, "group");
 
-		assertEquals("andre", map.get("list[0].name"));
-		assertEquals("chevet", map.get("list[0].car.model"));
-		assertEquals(1976, map.get("list[0].car.year"));
+		assertEquals( "group1" , map.get("group.name"));
+		
+		assertEquals("andre", map.get("group.people[0].name"));
+		assertEquals("chevet", map.get("group.people[0].car.model"));
+		assertEquals(1976, map.get("group.people[0].car.year"));
 
-		assertEquals("joao", map.get("list[1].name"));
-		assertEquals("fuscao", map.get("list[1].car.model"));
-		assertEquals(1966, map.get("list[1].car.year"));
+		assertEquals("joao", map.get("group.people[1].name"));
+		assertEquals("fuscao", map.get("group.people[1].car.model"));
+		assertEquals(1966, map.get("group.people[1].car.year"));
 	}
 
 	private Person newPerson(String name, Car car) {
@@ -129,6 +133,20 @@ public class ParamsTest {
 		car.model = model;
 		car.year = year;
 		return car;
+
+	}
+	
+	public static class Group{
+		
+		List<Person> people;
+		
+		String name;
+
+		public Group(List<Person> people, String name) {
+			super();
+			this.people = people;
+			this.name = name;
+		}
 
 	}
 
