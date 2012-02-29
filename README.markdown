@@ -1,4 +1,4 @@
-$ WHY?
+# WHY?
 
 ![Build Status](https://secure.travis-ci.org/andrerigon/vraptor-client.png)
 
@@ -59,7 +59,7 @@ public class ClientTest {
 </code>
 </pre>
 
-$ INSTALLATION
+# INSTALLATION
 
 <pre>
 <code>git clone git://github.com/andrerigon/vraptor-client.git
@@ -67,7 +67,7 @@ cd vraptor-client
 mvn install</code>
 </pre>
 
-$ USAGE
+# USAGE
 
 vraptor does not use interfaces to obtain route information by default.
 To do that, you need to let vraptor use interfaces to obtain controller's information, using
