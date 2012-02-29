@@ -26,20 +26,17 @@ public class ClientController implements Clients{
 
 it implements Clients interface:
 
-<pre>
-<code>
+```java
 public interface Clients {
 
    @Post("save")
    String save(@Named("client") Client client);
 }
-</code>
-</pre>
+```
 
 int the client, you just have to inject the proxy implementation and use the interface:
 
-<pre>
-<code>
+```java
 public class ClientTest {
 
     @Autowired
@@ -54,8 +51,7 @@ public class ClientTest {
 	}
 
 }
-</code>
-</pre>
+```
 
 ## INSTALLATION
 
@@ -77,11 +73,9 @@ Also, the controller's interfaces will need to use @Named annotation to indicate
 
 The proxy handler classe is:
 
-<pre>
-<code>
+```java
 br.com.vraptor.client.handler.RestProxyHandler
-</code>
-</pre>
+```
 
 it needs three constructor arguments:
 
@@ -98,11 +92,9 @@ Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class
 
 if you use spring, there is a factory bean to create the services for you
 
-<pre>
-<code>
+```xml
 <bean name="factory" class=" br.com.vraptor.client.spring.SpringRestFactory" />
-</code>
-</pre>
+```
 
 it will need some beans:
 
