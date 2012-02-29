@@ -53,7 +53,7 @@ public class ClientTest {
 }
 ```
 
-## INSTALLATION
+## INSTALL
 
 <pre>
 <code>git clone git://github.com/andrerigon/vraptor-client.git
