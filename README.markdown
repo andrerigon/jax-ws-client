@@ -11,8 +11,7 @@ interface that you use in the server's implementation, building correctly a requ
 
 For example, imagine a vraptor controller:
 
-<pre>
-<code>
+```java
 @Resource
 public class ClientController implements Clients{
 
@@ -23,8 +22,7 @@ public class ClientController implements Clients{
 	}
 
 }
-</code>
-</pre>
+```
 
 it implements Clients interface:
 
