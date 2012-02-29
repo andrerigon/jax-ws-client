@@ -93,12 +93,10 @@ it needs three constructor arguments:
 
 to create a proxy, you'll need to do:
 
-<pre>
-<code>
+```java
 Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { clazz },
 				new RestProxyHandler(restClient, path, parser))
-</code>
-</pre>
+```
 
 if you use spring, there is a factory bean to create the services for you
 
