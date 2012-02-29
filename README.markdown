@@ -67,8 +67,7 @@ vraptor does not use interfaces to obtain route information by default.
 To do that, you need to let vraptor use interfaces to obtain controller's information, using
 a customized route parser.
 
-
-<script src="https://gist.github.com/1149159.js?file=InterfaceBasedPathAnnotationRoutesParser.java"></script>
+There's an implementation at: https://gist.github.com/1149159
 
 Also, the controller's interfaces will need to use @Named annotation to indicate parameters name. Without that, paranamer won't be able to figure out params names.
 
