@@ -1,6 +1,6 @@
 $ WHY?
 
-[![Build Status](https://secure.travis-ci.org/andrerigon/vraptor-client.png)]
+![Build Status](https://secure.travis-ci.org/andrerigon/vraptor-client.png)
 
 when writing a java client app for rest based service, you must have duplication.
 You need to duplicate urls, paths, parameters type and order.
