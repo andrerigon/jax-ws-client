@@ -76,9 +76,9 @@ org.jaxwsclient.handler.RestProxyHandler
 
 it needs four constructor arguments:
 
-* a class implementing **br.com.vraptor.client.RestClient** - it will be in charge of doing the http requests
+* a class implementing **org.jaxwsclient.RestClient** - it will be in charge of doing the http requests
 * the base path for the request
-* a class implementing **br.com.vraptor.client.ResultParser** - it will parse the response and deal with exceptions
+* a class implementing **org.jaxwsclient.ResultParser** - it will parse the response and deal with exceptions
 * the class to be proxied
 
 to create a proxy, you'll need to do:
