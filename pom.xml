@@ -32,8 +32,8 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git://github.com/andrerigon/jax-ws-client.git</connection>
-		<developerConnection>scm:git:git://github.com/andrerigon/jax-ws-client.git</developerConnection>
+		<connection>scm:git:git@github.com:andrerigon/jax-ws-client.git</connection>
+		<developerConnection>scm:git:git@github.com:andrerigon/jax-ws-client.git</developerConnection>
 		<url>https://github.com/andrerigon/jax-ws-client</url>
 	</scm>
 
