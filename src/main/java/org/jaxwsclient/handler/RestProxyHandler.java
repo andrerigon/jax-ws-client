@@ -9,6 +9,8 @@ import java.util.Map;
 import org.jaxwsclient.RestClient;
 import org.jaxwsclient.RestMethod;
 import org.jaxwsclient.ResultParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -20,16 +22,31 @@ public class RestProxyHandler implements InvocationHandler {
 
 	private final ResultParser parser;
 
+	private final Logger logger;
+
+	@SuppressWarnings("unchecked")
+	public static <T> T newProxy(RestClient restClient, String basePath, ResultParser parser, Class<T> clazz, Logger logger) {
+		return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { clazz }, new RestProxyHandler(restClient,
+				basePath, parser, clazz, logger));
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> T newProxy(RestClient restClient, String basePath, ResultParser parser, Class<T> clazz) {
 		return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { clazz }, new RestProxyHandler(restClient,
-				basePath, parser, clazz));
+				basePath, parser, clazz, LoggerFactory.getLogger(clazz)));
 	}
 
 	public RestProxyHandler(RestClient restClient, String basePath, ResultParser parser, Class<?> clazz) {
 		this.restClient = restClient;
 		this.parser = parser;
+		this.logger = LoggerFactory.getLogger(clazz);
+		this.cache = readMethods(basePath, clazz);
+	}
 
+	public RestProxyHandler(RestClient restClient, String basePath, ResultParser parser, Class<?> clazz, Logger logger) {
+		this.restClient = restClient;
+		this.parser = parser;
+		this.logger = logger;
 		this.cache = readMethods(basePath, clazz);
 	}
 
@@ -50,8 +67,22 @@ public class RestProxyHandler implements InvocationHandler {
 		}
 		RestMethod restMethod = cache.get(method);
 		try {
-			final String result = restMethod.invoke(restClient, args);
-			return parser.parse(result, method.getGenericReturnType());
+			long time = System.currentTimeMillis();
+			final String httpResult = restMethod.invoke(restClient, args);
+			if (logger.isDebugEnabled()) {
+				time = System.currentTimeMillis() - time;
+				logger.debug(String.format("Method %s executed in %d ms,", restMethod.toString(), time));
+			}
+			if (logger.isDebugEnabled()) {
+				time = System.currentTimeMillis();
+			}
+
+			Object result = parser.parse(httpResult, method.getGenericReturnType());
+			if (logger.isDebugEnabled()) {
+				time = System.currentTimeMillis() - time;
+				logger.debug(String.format("%s parsed in %d ms", result.getClass().getName(), time));
+			}
+			return parser;
 		} catch (Throwable e) {
 			return parser.dealWith(e, method, restMethod);
 		}
