@@ -71,7 +71,7 @@ public class ExceptionTest {
 
 	@SuppressWarnings("unchecked")
 	private void throw_inside_client(Throwable t) throws Exception {
-		doThrow(t).when(client).get(anyString(), anyMap());
+		doThrow(t).when(client).get(anyString(), anyMap(), anyMap());
 	}
 
 	private SampleService sampleService() {

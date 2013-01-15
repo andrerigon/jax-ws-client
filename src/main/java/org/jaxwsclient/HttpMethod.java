@@ -2,6 +2,7 @@ package org.jaxwsclient;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -12,7 +13,7 @@ enum HttpMethod {
 	GET {
 		@Override
 		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
-			return restClient.get(requestInfo.getPath(), requestInfo.getParams());
+			return restClient.get(requestInfo.getPath(), requestInfo.getParams(), null);
 		}
 
 	},
@@ -20,7 +21,7 @@ enum HttpMethod {
 	POST {
 		@Override
 		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
-			return restClient.post(requestInfo.getPath(), requestInfo.getParams());
+			return restClient.post(requestInfo.getPath(), requestInfo.getParams(), null);
 		}
 
 	},
@@ -28,14 +29,14 @@ enum HttpMethod {
 
 		@Override
 		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
-			return restClient.delete(requestInfo.getPath(), requestInfo.getParams());
+			return restClient.delete(requestInfo.getPath(), requestInfo.getParams(), null);
 		}
 	},
 	PUT {
 
 		@Override
 		protected String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
-			return restClient.put(requestInfo.getPath(), requestInfo.getParams());
+			return restClient.put(requestInfo.getPath(), requestInfo.getParams(), null);
 		}
 	};
 
