@@ -15,7 +15,6 @@ import org.jaxwsclient.params.Parameters;
 import org.jaxwsclient.params.ParametersSerializer;
 import org.junit.Test;
 
-
 public class ParamsTest {
 
 	String[] names = { "name", "age" };
@@ -38,9 +37,8 @@ public class ParamsTest {
 		Car car = newCar("fusca", 1972);
 
 		Map<String, Object> params = ParametersSerializer.paramsFor(car, "car");
-
-		assertEquals("fusca", params.get("car.model"));
-		assertEquals(1972, params.get("car.year"));
+		assertEquals("fusca", params.get("model"));
+		assertEquals(1972d, params.get("year"));
 	}
 
 	@Test
@@ -58,10 +56,9 @@ public class ParamsTest {
 		Person p = newPerson("andre", newCar("fusca", 1972));
 
 		Map<String, Object> params = ParametersSerializer.paramsFor(p, "person");
-
-		assertEquals("andre", params.get("person.name"));
-		assertEquals("fusca", params.get("person.car.model"));
-		assertEquals(1972, params.get("person.car.year"));
+		assertEquals("andre", params.get("name"));
+		assertEquals("fusca", this.<Map<String, Object>> get(params, "car").get("model"));
+		assertEquals(1972d, this.<Map<String, Object>> get(params, "car").get("year"));
 
 	}
 
@@ -87,13 +84,12 @@ public class ParamsTest {
 
 		Map<String, Object> params = ParametersSerializer.paramsFor(p, "person");
 
-		assertEquals("andre", params.get("person.name"));
-		assertFalse(params.containsKey("person.car"));
+		assertEquals("andre", params.get("name"));
+		assertFalse(params.containsKey("car"));
 	}
 
 	@Test
-	public void should_not_send_null_list_params() throws IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException {
+	public void should_not_send_null_list_params() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		final List<String> carList = null;
 
 		Map<String, Object> params = ParametersSerializer.paramsFor(carList, "carList");
@@ -102,23 +98,27 @@ public class ParamsTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void should_serialize_list_with_inner_complex_objects() throws Exception {
-		final List<Person> list = Arrays.asList(newPerson("andre", newCar("chevet", 1976)),
-				newPerson("joao", newCar("fuscao", 1966)));
-		
+		final List<Person> list = Arrays.asList(newPerson("andre", newCar("chevet", 1976)), newPerson("joao", newCar("fuscao", 1966)));
+
 		Group group = new Group(list, "group1");
 
 		Map<String, ?> map = ParametersSerializer.paramsFor(group, "group");
 
-		assertEquals( "group1" , map.get("group.name"));
-		
-		assertEquals("andre", map.get("group.people[0].name"));
-		assertEquals("chevet", map.get("group.people[0].car.model"));
-		assertEquals(1976, map.get("group.people[0].car.year"));
+		assertEquals("group1", map.get("name"));
 
-		assertEquals("joao", map.get("group.people[1].name"));
-		assertEquals("fuscao", map.get("group.people[1].car.model"));
-		assertEquals(1966, map.get("group.people[1].car.year"));
+		Map<String, Object> andre = ((List<Map<String, Object>>) map.get("people")).get(0);
+
+		assertEquals("andre", andre.get("name"));
+		assertEquals("chevet", ((Map<String, Object>) andre.get("car")).get("model"));
+		assertEquals(1976d, ((Map<String, Object>) andre.get("car")).get("year"));
+
+		Map<String, Object> joao = ((List<Map<String, Object>>) map.get("people")).get(1);
+
+		assertEquals("joao", joao.get("name"));
+		assertEquals("fuscao", ((Map<String, Object>) joao.get("car")).get("model"));
+		assertEquals(1966d, ((Map<String, Object>) joao.get("car")).get("year"));
 	}
 
 	private Person newPerson(String name, Car car) {
@@ -135,11 +135,11 @@ public class ParamsTest {
 		return car;
 
 	}
-	
-	public static class Group{
-		
+
+	public static class Group {
+
 		List<Person> people;
-		
+
 		String name;
 
 		public Group(List<Person> people, String name) {
@@ -255,5 +255,10 @@ public class ParamsTest {
 
 	private Method sampleMethod() throws Exception {
 		return ParamsTest.class.getDeclaredMethod("method", String.class, int.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T get(Map<String, ?> params, String key) {
+		return (T) params.get(key);
 	}
 }
