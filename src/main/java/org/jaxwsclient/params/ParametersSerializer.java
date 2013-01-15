@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import com.google.common.math.DoubleMath;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class ParametersSerializer {
 
+	@SuppressWarnings("unchecked")
 	public static Map<String, Object> paramsFor(Object object, String name) throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
 		if (object == null) {
@@ -25,9 +28,38 @@ public class ParametersSerializer {
 			return serializedList((List<?>) object, name);
 		}
 		final Gson gson = new Gson();
-		
-		return gson.fromJson(gson.toJson(object), new TypeToken<Map<String, Object>>() {
-		}.getType());
+
+		return fixNumbers((Map<String, Object>) gson.fromJson(gson.toJson(object), new TypeToken<Map<String, Object>>() {
+		}.getType()));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static Map<String, Object> fixNumbers(Map<String, Object> map) {
+		Map<String, Object> fixed = new HashMap<String, Object>();
+		for (Entry<String, Object> e : map.entrySet()) {
+			if (e.getValue() instanceof Number) {
+				fixed.put(e.getKey(), lowestNumberImpl((Number) e.getValue()));
+			}
+			else if( e.getValue() instanceof Map){
+				fixed.put(e.getKey(), fixNumbers((Map<String, Object>) e.getValue()));
+			}
+			else {
+				fixed.put(e.getKey(), e.getValue());
+			}
+		}
+		return fixed;
+	}
+
+	/**
+	 * Gson serializing strategy is always deserializing to Double
+	 * @param value
+	 * @return
+	 */
+	private static Number lowestNumberImpl(Number value) {
+		if (!DoubleMath.isMathematicalInteger(value.doubleValue())) {
+			return value;
+		}
+		return value.longValue();
 	}
 
 	private static Map<String, Object> serializedList(List<?> list, String name) throws IllegalAccessException, InvocationTargetException,
