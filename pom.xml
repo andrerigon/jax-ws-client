@@ -3,7 +3,7 @@
 
 	<groupId>jax-ws-client</groupId>
 	<artifactId>jax-ws-client</artifactId>
-	<version>2.3-SNAPSHOT</version>
+	<version>2.3</version>
 	<packaging>jar</packaging>
 
 	<name>jax-ws-client</name>
