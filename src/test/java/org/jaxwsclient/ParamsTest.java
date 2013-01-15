@@ -38,7 +38,7 @@ public class ParamsTest {
 
 		Map<String, Object> params = ParametersSerializer.paramsFor(car, "car");
 		assertEquals("fusca", params.get("model"));
-		assertEquals(1972d, params.get("year"));
+		assertEquals(1972l, params.get("year"));
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class ParamsTest {
 		Map<String, Object> params = ParametersSerializer.paramsFor(p, "person");
 		assertEquals("andre", params.get("name"));
 		assertEquals("fusca", this.<Map<String, Object>> get(params, "car").get("model"));
-		assertEquals(1972d, this.<Map<String, Object>> get(params, "car").get("year"));
+		assertEquals(1972l, this.<Map<String, Object>> get(params, "car").get("year"));
 
 	}
 
