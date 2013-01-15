@@ -82,7 +82,7 @@ public class RestProxyHandler implements InvocationHandler {
 				time = System.currentTimeMillis() - time;
 				logger.debug(String.format("%s parsed in %d ms", result.getClass().getName(), time));
 			}
-			return parser;
+			return result;
 		} catch (Throwable e) {
 			return parser.dealWith(e, method, restMethod);
 		}
