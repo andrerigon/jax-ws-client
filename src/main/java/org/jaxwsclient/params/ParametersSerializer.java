@@ -68,12 +68,7 @@ public class ParametersSerializer {
 		if (list.isEmpty() || isWrapperType(list.get(0).getClass())) {
 			return simpleMapForValue(list, name);
 		}
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		for (int i = 0; i < list.size(); i++) {
-			map.putAll(paramsFor(list.get(i), name + "[" + i + "]"));
-		}
-		return map;
+		return simpleMapForValue(list, name);
 	}
 
 	private static boolean isEnum(Object object) {

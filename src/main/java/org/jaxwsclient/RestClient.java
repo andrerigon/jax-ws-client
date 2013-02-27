@@ -1,5 +1,6 @@
 package org.jaxwsclient;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public interface RestClient {
@@ -11,5 +12,7 @@ public interface RestClient {
 	String put(String path, Map<String, Object> params, Map<String, String> headers) throws Exception;
 
 	String delete(String path, Map<String, Object> params, Map<String, String> headers) throws Exception;
+
+	String postWithBody(String path, String body, String contentType, Map<String, String> headers) throws Exception;
 
 }

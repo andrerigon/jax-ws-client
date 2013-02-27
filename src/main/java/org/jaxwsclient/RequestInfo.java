@@ -7,14 +7,18 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jaxwsclient.params.Body;
 import org.jaxwsclient.params.Parameters;
 import org.jaxwsclient.params.ParametersSerializer;
 
+import com.google.gson.Gson;
 
 class RequestInfo {
 
 	private String path;
 	private Map<String, Object> params;
+	private boolean body = false;
+	private String bodyContentType;
 
 	public RequestInfo(String path, Parameters parameters, Object[] args) throws UnsupportedEncodingException {
 		this.params = paramsMap(parameters, args);
@@ -29,12 +33,23 @@ class RequestInfo {
 		return params;
 	}
 
-	protected Map<String, Object> paramsMap(Parameters parameters, Object[] args) {
+	public boolean hasBody() {
+		return this.body;
+	}
+	
+
+	protected Map<String, Object> paramsMap(Parameters parameters, final Object[] args) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (int i = 0; i < parameters.size(); i++) {
 			try {
+				final Object arg = args[i];
+				if (parameters.getInfo(i).hasAnnotation(Body.class)) {
+					this.body = true;
+					this.bodyContentType = parameters.getInfo(i).annotation(Body.class).contentType();
+					map.put("body", new Gson().toJson(arg));
+				}
 				if (args[i] != null) {
-					map.putAll(ParametersSerializer.paramsFor(args[i], parameters.name(i)));
+					map.putAll(ParametersSerializer.paramsFor(arg, parameters.name(i)));
 				}
 			} catch (Exception e) {
 				throw new IllegalArgumentException("could not obtain params");
@@ -44,16 +59,14 @@ class RequestInfo {
 
 	}
 
-	protected String requestPath(String path, Map<String, Object> params, Parameters parameters)
-			throws UnsupportedEncodingException {
+	protected String requestPath(String path, Map<String, Object> params, Parameters parameters) throws UnsupportedEncodingException {
 
 		Set<String> pathParams = new LinkedHashSet<String>();
 
 		for (String name : params.keySet()) {
 			if (parameters.isPathParameter(name)) {
 				Object paramValue = params.get(name);
-				path = path.replaceAll(Parameters.regex(path, name), paramValue == null ? "" : encode(params.get(name)
-						.toString()));
+				path = path.replaceAll(Parameters.regex(path, name), paramValue == null ? "" : encode(params.get(name).toString()));
 				pathParams.add(name);
 			}
 		}
@@ -78,6 +91,10 @@ class RequestInfo {
 		for (String param : pathParams) {
 			params.remove(param);
 		}
+	}
+
+	public String getBodyContentType() {
+		return bodyContentType;
 	}
 
 }

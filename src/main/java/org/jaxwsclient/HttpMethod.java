@@ -19,8 +19,13 @@ enum HttpMethod {
 
 	POST {
 		@Override
-		public String makeRequest(RequestInfo requestInfo, RestClient restClient) throws Exception {
-			return restClient.post(requestInfo.getPath(), requestInfo.getParams(), null);
+		public String makeRequest(final RequestInfo requestInfo, RestClient restClient) throws Exception {
+			if (!requestInfo.hasBody()) {
+				return restClient.post(requestInfo.getPath(), requestInfo.getParams(), null);
+			} else {
+				
+				return restClient.postWithBody(requestInfo.getPath(), requestInfo.getParams().get("body").toString(), requestInfo.getBodyContentType(), null);
+			}
 		}
 
 	},

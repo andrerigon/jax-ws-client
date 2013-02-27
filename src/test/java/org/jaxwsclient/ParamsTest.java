@@ -15,6 +15,8 @@ import org.jaxwsclient.params.Parameters;
 import org.jaxwsclient.params.ParametersSerializer;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+
 public class ParamsTest {
 
 	String[] names = { "name", "age" };
@@ -119,6 +121,16 @@ public class ParamsTest {
 		assertEquals("joao", joao.get("name"));
 		assertEquals("fuscao", ((Map<String, Object>) joao.get("car")).get("model"));
 		assertEquals(1966d, ((Map<String, Object>) joao.get("car")).get("year"));
+	}
+	
+	@Test
+	public void should_serialize_list_of_objects() throws Exception{
+		List<Car> list = Arrays.asList(newCar("chevet", 1976),newCar("monza", 1986));
+		
+		Map<String,Object> map = ParametersSerializer.paramsFor(list, "list");
+		
+		assertEquals( list, map.get( "list" ) );
+		
 	}
 
 	private Person newPerson(String name, Car car) {

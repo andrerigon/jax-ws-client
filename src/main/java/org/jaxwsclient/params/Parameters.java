@@ -44,6 +44,10 @@ public class Parameters {
 		}
 		return false;
 	}
+	
+	public ParameterInfo getInfo(int index){
+		return params.get( index );
+	}
 
 	public ImmutableList<String> names() {
 		return names;
