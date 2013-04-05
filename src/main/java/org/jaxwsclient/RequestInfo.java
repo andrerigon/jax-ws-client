@@ -46,7 +46,7 @@ class RequestInfo {
 				if (parameters.getInfo(i).hasAnnotation(Body.class)) {
 					this.body = true;
 					this.bodyContentType = parameters.getInfo(i).annotation(Body.class).contentType();
-					map.put("body", arg == null ? null : new Gson().toJson(arg));
+					map.put("body", arg == null ? "" : new Gson().toJson(arg));
 				}
 				if (args[i] != null) {
 					map.putAll(ParametersSerializer.paramsFor(arg, parameters.name(i)));
