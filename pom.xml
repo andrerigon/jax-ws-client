@@ -3,7 +3,7 @@
 
 	<groupId>jax-ws-client</groupId>
 	<artifactId>jax-ws-client</artifactId>
-	<version>2.6</version>
+	<version>2.7</version>
 	<packaging>jar</packaging>
 
 	<name>jax-ws-client</name>
@@ -132,10 +132,14 @@
 			<name>Sonatype Nexus snapshot repository</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
-		<repository>
+		<!--<repository>
 			<id>sonatype-nexus-staging</id>
 			<name>Sonatype Nexus release repository</name>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>-->
+		<repository>
+			<id>archiva.internal</id>
+			<url>http://cvs.globoi.com/archiva/repository/internal</url>
 		</repository>
 	</distributionManagement>
 
